@@ -10,9 +10,9 @@
 
 # targets files
 _targets/
-#in/
-#out/
-#!*.empty
+in/
+out/
+!*.empty
 
 # Example code in package build process
 *-Ex.R
