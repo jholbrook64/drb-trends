@@ -1,29 +1,15 @@
-# starter functions for reading in data
-
-evaluate_annual <- function(in_file) {
-  
-  # these are "raw" data not reduced to a single obs 
-  # per seg-day
-  dat <- readRDS(in_file)
-  
-  # now we can summarize by segment ID, which is the unit we should be measuring data availability
-  # so, for example, we can calculate how many unique days of measurement a site has per year:
-  annual <- dat %>%
-    # make new year column for grouping
-    mutate(year = lubridate::year(date)) %>%
-    group_by(seg_id_nat, year) %>%
-    # group by and summarize reduced data frame down to one row per seg_id_nat-year combo
-    # we count unique dates because some stream segments will have multiple sites, and 
-    # we don't want to double count since we'll have to evaluate a single value per day
-    summarize(n_per_year = length(unique(date))) %>%
-    group_by(seg_id_nat) %>%
-    # group by and mutate will still do evaluation by group, but won't reduce to one value per seg_id_nat
-    # this will produce repeated values per seg_id_nat
-    mutate(n_all_time = sum(n_per_year)) %>% ungroup()
-  
-  # returns dataframe
-  return(annual)
-}
+## ---------------------------
+##
+## Script name: site_selection_code
+##
+## Purpose of script: selecting sites
+##
+## Author: Jack Holbrook (USGS)
+##
+## ---------------------------
+## Notes:
+##     ~
+## ---------------------------
 
 meta_data <- function(annual) # this will be the function that does an eda of the data here:
 {
@@ -38,21 +24,50 @@ meta_data <- function(annual) # this will be the function that does an eda of th
     n_per_year = mean(n_per_year),
     n_all_time = mean(n_all_time)
   )
-  
-  # we will begin an operation to remove years with low sampling
-  #table <- table %>% summarise()
-  
-  # for (year in vector) {
-  #   
-  # }
-  
   readr::write_csv(table, 'out/groupedTable.csv')
   return('out/groupedTable.csv')
 }
 
-if_nan <- function(x)
+
+split_df <- function(in_file)
 {
-  is.nan(x)
+  dat <- readRDS(in_file)
+  split_data <- split(dat, f= annual$seg_id_nat) #split(annual, seg_id_nat)
+  split_data <- lapply(split_data, get_dateRange)
+  # site_summary <- vector()
+  # for (site_id in split_data) 
+  # {
+  #   # can call the group time function here as well
+  #   #for each segment, create a list the holds segment id, date at head, date at tail
+  #   new_vect <- split_data[site_id, seg_id_nat]   
+  # }
+  # readr::write_csv(table, 'out/splitData.csv')
+  # return('out/splitData.csv')
+  print(split_data)  # printing gives the correct number of tibbles. (1 per group) 
+  return(split_data)
+}
+
+group_time <- function(dirty_months)
+{
+  # set removal vector to 0
+  removeVect <- 0
+  #creates vector of indeces to be removed
+  for (var in 1:nrow(dirty_months)) 
+    {
+    x <- as.POSIXlt(dirty_months[var, 3], tz = "", format,
+                    tryFormats = c("%Y-%m-%d",
+                                   "%Y/%m/%d"))
+    # compare n_per_month to the date
+    if (dirty_months[var, 12] != lubridate::days_in_month(x)) {
+      removeVect <- c(removeVect, var)
+    }
+  }
+  # removes those indices
+  clean_months <- dirty_months[-removeVect,]
+  
+  # watch out, im keeping this the same namespace
+  readr::write_rds(dat, 'out/data_with_months.rds')  
+  return('out/data_with_months.rds')
 }
 
 write_up <- function(annual)
@@ -64,4 +79,28 @@ write_up <- function(annual)
   #seg_id_nat year n_per_year n_all_time 
   #332         85        343        245
   return(no_unique)
+}
+
+# get_dateRange <- function(alist)   leave this one, found different way to solve the problem this addresses
+# {
+#   for (variable in alist) 
+#   {
+#     
+#   }
+# }
+
+numberOfDays <- function(date) # use this function to compare month to day # in month
+  {
+  m <- format(date, format="%m")
+  
+  while (format(date, format="%m") == m) {
+    date <- date + 1
+  }
+  # change return signature to account for allowed missed days
+  return(as.integer(format(date - 1, format="%d")))
+}
+
+if_nan <- function(x)
+{
+  is.nan(x)
 }

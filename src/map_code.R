@@ -1,3 +1,16 @@
+## ---------------------------
+##
+## Script name: map code
+##
+## Purpose of script: mapping reaches $ their annual observations
+##
+## Author: Jack Holbrook (USGS)
+##
+## ---------------------------
+## Notes:
+##     ~
+## ---------------------------
+
 map_sites <- function(in_dat, in_network) {
   
   net <- readRDS(in_network)[[1]]
