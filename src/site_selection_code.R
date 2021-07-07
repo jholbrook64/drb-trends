@@ -28,7 +28,7 @@ meta_data <- function(annual) # this will be the function that does an eda of th
   return('out/groupedTable.csv')
 }
 
-
+# this one will be useful for plotting later on 
 split_df <- function(in_file)
 {
   dat <- readRDS(in_file)
@@ -47,27 +47,18 @@ split_df <- function(in_file)
   return(split_data)
 }
 
-group_time <- function(dirty_months)
+group_time <- function(add_days)
 {
-  # set removal vector to 0
-  removeVect <- 0
-  #creates vector of indeces to be removed
-  for (var in 1:nrow(dirty_months)) 
-    {
-    x <- as.POSIXlt(dirty_months[var, 3], tz = "", format,
-                    tryFormats = c("%Y-%m-%d",
-                                   "%Y/%m/%d"))
-    # compare n_per_month to the date
-    if (dirty_months[var, 12] != lubridate::days_in_month(x)) {
-      removeVect <- c(removeVect, var)
-    }
-  }
-  # removes those indices
-  clean_months <- dirty_months[-removeVect,]
+  annual <- add_days %>%
+    mutate(year = lubridate::year(date)) %>%
+    group_by(seg_id_nat, year) %>%
+    drop_na(seg_id_nat) %>%
+    summarize(n_per_year = length(unique(date))) %>%
+    group_by(seg_id_nat) %>%
+    mutate(n_all_time = sum(n_per_year)) %>% ungroup()
   
-  # watch out, im keeping this the same namespace
-  readr::write_rds(dat, 'out/data_with_months.rds')  
-  return('out/data_with_months.rds')
+  print(head(annual))
+  return(annual)
 }
 
 write_up <- function(annual)
@@ -79,28 +70,4 @@ write_up <- function(annual)
   #seg_id_nat year n_per_year n_all_time 
   #332         85        343        245
   return(no_unique)
-}
-
-# get_dateRange <- function(alist)   leave this one, found different way to solve the problem this addresses
-# {
-#   for (variable in alist) 
-#   {
-#     
-#   }
-# }
-
-numberOfDays <- function(date) # use this function to compare month to day # in month
-  {
-  m <- format(date, format="%m")
-  
-  while (format(date, format="%m") == m) {
-    date <- date + 1
-  }
-  # change return signature to account for allowed missed days
-  return(as.integer(format(date - 1, format="%d")))
-}
-
-if_nan <- function(x)
-{
-  is.nan(x)
 }
