@@ -100,20 +100,10 @@ plot_fig <- function(in_file, add_days)
 
 plot_all_segments <- function(time_series_plots, fileout)
 {
-  
-  total <- unique(time_series_plots$seg_id_nat)
-  # create progress bar
-  pb <- txtProgressBar(min = 0, max = total, style = 3)
-  for(i in 1:total){
-    Sys.sleep(0.1)
-    # update progress bar
-    setTxtProgressBar(pb, i)
-  }
-  close(pb)
-  
   # takes in the dataframe thats been filtered down by start and end dates per id. 
   plot_list = list()
-  for (i in unique(time_series_plots$seg_id_nat)) {
+  for (i in unique(time_series_plots$seg_id_nat)) 
+    {
     chart_title <- substitute(paste("chart for segment ", i))
     p = ggplot(time_series_plots[time_series_plots$seg_id_nat == i,],
             aes(date, max_temp_c)) + 
@@ -121,15 +111,13 @@ plot_all_segments <- function(time_series_plots, fileout)
             labs(title = chart_title, x = "date", y = "Max Temp in deg C") +
             theme_minimal()
     plot_list[[i]] = p
-            #ggsave(fileout, width = 12, height = 8)
-            
-            # check if ggsave should be inside or outside the print statement
   }
-  
+  #create pdf
   pdf(fileout)
-  for (i in unique(time_series_plots$seg_id_nat)) {
+  for (i in unique(time_series_plots$seg_id_nat)) 
+    {
     print(plot_list[[i]])
-  }
+    }
   #return the pdf file
   return(fileout)
 }

@@ -43,21 +43,6 @@ split_df <- function(in_file)
   return(split_data)
 }
 
-# old one: (7/8/2021) 
-# group_time <- function(add_days)  # this will be the data preparing function!
-# {
-#   annual <- add_days %>%
-#     mutate(year = lubridate::year(date)) %>%
-#     group_by(seg_id_nat, year) %>%
-#     drop_na(seg_id_nat) %>%
-#     summarize(n_per_year = length(unique(date))) %>%
-#     group_by(seg_id_nat) %>%
-#     mutate(n_all_time = sum(n_per_year)) %>% ungroup()
-#   
-#   print(head(annual))
-#   return(annual)
-# }
-
 group_time <- function(add_days)  # this will be the data preparing function!
 {
   time_series_plots <- add_days %>% 
@@ -67,8 +52,58 @@ group_time <- function(add_days)  # this will be the data preparing function!
     filter(start_date_id <= as.Date("1995-01-01")) %>%
     filter(end_date_id >= as.Date("2010-01-01")) %>% 
     ungroup()
-  
   return(time_series_plots)
+}
+
+monthly_trend_analysis <- function(time_series_plots)
+{
+  # summarize(month_mean = mean(mean_temp_c),
+  #           month_meanOfMax = mean(max_temp_c),
+  #           month_meanOfMin = mean(min_temp_c)) %>% 
+  
+  add_month <- time_series_plots %>% 
+    mutate(month = lubridate::month(date)) %>% 
+    mutate(year = lubridate::year(date)) %>% 
+    group_by(month, year) %>% 
+    mutate(month_mean = mean(mean_temp_c)) %>%
+    mutate(month_meanOfMax = mean(max_temp_c)) %>%
+    mutate(month_meanOfMin = mean(min_temp_c))#%>%
+    #ungroup()
+  
+  print(add_month)
+  return(add_month)  
+}
+
+regression_for_each_site_monthly <- function(regressionData, fileout)
+{
+  # take return from monthly_trend_analysis
+  
+  #this is still WIP
+  lr_list = list()
+  for (i in unique(regressionData$month)) 
+  {
+    sites <- regressionData %>% 
+      group_by(month)
+  }
+  readr::write_csv(sites, fileout)
+  return('2_process/out/DRB_site_regress_Values.csv')
+}
+
+
+DRB_regression_monthly <-  function(regressionData, fileout)
+{
+  # take return from monthly_trend_analysis
+  lr_list = list()
+  for (i in unique(regressionData$month)) 
+  {
+    unique_month <- regressionData %>% 
+      filter(month != i)  
+    lr <- lm(month_mean ~ year, data = unique_month)
+    lr_list[[i]] = lr
+  }
+  
+  readr::write_lines(lr_list, fileout)
+  return('2_process/out/DRB_regress_Values.txt')
 }
 
 write_up <- function(annual)
