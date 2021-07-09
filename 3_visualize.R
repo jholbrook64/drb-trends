@@ -17,5 +17,8 @@ p3_targets_list <- list(
              plot_current(add_days, fileout = "out/Current_Monthly_Sites_Records.png"), format = 'file'),
   
   tar_target(site_map_interactive,
-             map_tiles(annual_summary, 'in/network.rds'), format = 'file')
+             map_tiles(annual_summary, 'in/network.rds'), format = 'file'),
+  
+  tar_target(All_segements_plotted,
+             plot_all_segments(time_grouped, fileout = "3_visualize/out/plots_page.pdf"), format = "file")
 )

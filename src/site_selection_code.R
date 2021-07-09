@@ -16,10 +16,6 @@ meta_data <- function(annual) # this will be the function that does an eda of th
   minimum_sampled_days <-  121 # four months
   table <- annual %>% group_by(seg_id_nat) 
   table <- subset(table, table[, 3] > minimum_sampled_days)
-  
-  #table <- subset(table, table[, 1] == if_nan(table$seg_id_nat))
-  # %>% annual[annual[, 3(annual)]>= minimum_sampled_days] 
-  
   table <- table %>% group_by(seg_id_nat) %>% summarise(
     n_per_year = mean(n_per_year),
     n_all_time = mean(n_all_time)
@@ -47,18 +43,32 @@ split_df <- function(in_file)
   return(split_data)
 }
 
-group_time <- function(add_days)
+# old one: (7/8/2021) 
+# group_time <- function(add_days)  # this will be the data preparing function!
+# {
+#   annual <- add_days %>%
+#     mutate(year = lubridate::year(date)) %>%
+#     group_by(seg_id_nat, year) %>%
+#     drop_na(seg_id_nat) %>%
+#     summarize(n_per_year = length(unique(date))) %>%
+#     group_by(seg_id_nat) %>%
+#     mutate(n_all_time = sum(n_per_year)) %>% ungroup()
+#   
+#   print(head(annual))
+#   return(annual)
+# }
+
+group_time <- function(add_days)  # this will be the data preparing function!
 {
-  annual <- add_days %>%
-    mutate(year = lubridate::year(date)) %>%
-    group_by(seg_id_nat, year) %>%
-    drop_na(seg_id_nat) %>%
-    summarize(n_per_year = length(unique(date))) %>%
-    group_by(seg_id_nat) %>%
-    mutate(n_all_time = sum(n_per_year)) %>% ungroup()
+  time_series_plots <- add_days %>% 
+    group_by(seg_id_nat) %>% 
+    mutate(start_date_id = min(date)) %>% 
+    mutate(end_date_id = max(date)) %>% 
+    filter(start_date_id <= as.Date("1995-01-01")) %>%
+    filter(end_date_id >= as.Date("2010-01-01")) %>% 
+    ungroup()
   
-  print(head(annual))
-  return(annual)
+  return(time_series_plots)
 }
 
 write_up <- function(annual)
