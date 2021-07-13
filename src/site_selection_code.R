@@ -44,7 +44,7 @@ split_df <- function(in_file)
 }
 
 group_time <- function(add_days)  # this will be the data preparing function!
-{
+{                                 # this si the same data as env var "data with months"
   time_series_plots <- add_days %>% 
     group_by(seg_id_nat) %>% 
     mutate(start_date_id = min(date)) %>% 
@@ -65,13 +65,13 @@ monthly_trend_analysis <- function(time_series_plots)
     mutate(month = lubridate::month(date)) %>% 
     mutate(year = lubridate::year(date)) %>% 
     group_by(month, year) %>% 
-    mutate(month_mean = mean(mean_temp_c)) %>%
-    mutate(month_meanOfMax = mean(max_temp_c)) %>%
-    mutate(month_meanOfMin = mean(min_temp_c))#%>%
+    mutate(month_mean = mean(mean_temp_c, na.rm = TRUE)) %>%
+    mutate(month_meanOfMax = mean(max_temp_c, na.rm = TRUE)) %>%
+    mutate(month_meanOfMin = mean(min_temp_c, na.rm = TRUE))#%>%
     #ungroup()
   
   print(add_month)
-  return(add_month)  
+  return(add_month)  # this is taken in as the parameter, regressionData in subsequent functions. 
 }
 
 regression_for_each_site_monthly <- function(regressionData, fileout)
@@ -92,18 +92,31 @@ regression_for_each_site_monthly <- function(regressionData, fileout)
 
 DRB_regression_monthly <-  function(regressionData, fileout)
 {
+  months = c("January", "February", "March", "April", "May", "June", "July", "August", 
+             "September", "October", "November", "December")
   # take return from monthly_trend_analysis
   lr_list = list()
   for (i in unique(regressionData$month)) 
   {
     unique_month <- regressionData %>% 
-      filter(month != i)  
+      filter(month == i)  
     lr <- lm(month_mean ~ year, data = unique_month)
     lr_list[[i]] = lr
   }
-  
-  readr::write_lines(lr_list, fileout)
-  return('2_process/out/DRB_regress_Values.txt')
+  pdf(fileout)
+  for (i in unique(regressionData$month)) 
+    {
+    print(lr_list[[i]])
+    unique_month <- regressionData %>% 
+      filter(month == i) 
+    print(plot(lr_list[[i]]))  #difficult to interpret
+    #print(plot(unique_month$year, unique_month$month_mean, main = months[i],
+    #           xlab = "year", ylab = "mean temperature on the month in celsius"))
+    #print(lines(predict(lr), col = 'green'))
+    }
+  return(fileout)
+  # readr::write_lines(lr_list, fileout)
+  # return('2_process/out/DRB_regress_Values.txt')
 }
 
 write_up <- function(annual)

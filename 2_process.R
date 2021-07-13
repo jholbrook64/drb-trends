@@ -13,10 +13,10 @@ p2_targets_list <- list(
              monthly_trend_analysis(time_grouped)),
   
   tar_target(all_sites_regression,
-             DRB_regression_monthly(trend_analysis_grouped_by_months, fileout = '2_process/out/DRB_regress_Values.csv'),
-             format = "file"),
-  
-  tar_target(each_site_regression,
-             regression_for_each_site_monthly(trend_analysis_grouped_by_months, fileout = '2_process/out/DRB_site_regress_Values.csv'),
+             DRB_regression_monthly(trend_analysis_grouped_by_months, fileout = '2_process/out/DRB_regress_Values.pdf'),
              format = "file")
+  
+  # tar_target(each_site_regression,
+  #            regression_for_each_site_monthly(trend_analysis_grouped_by_months, fileout = '2_process/out/DRB_site_regress_Values.csv'),
+  #            format = "file")
   )
