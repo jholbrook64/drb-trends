@@ -1,3 +1,16 @@
+## ---------------------------
+##
+## Script name: map code
+##
+## Purpose of script: mapping reaches $ their annual observations
+##
+## Author: Jack Holbrook (USGS)
+##
+## ---------------------------
+## Notes:
+##     ~
+## ---------------------------
+
 map_sites <- function(in_dat, in_network) {
   
   net <- readRDS(in_network)[[1]]
@@ -19,4 +32,21 @@ map_sites <- function(in_dat, in_network) {
   ggsave('out/example_plot.png', p, height = 7, width = 5)
   return('out/example_plot.png')
   
+}
+
+map_tiles <-function(in_dat, in_network)   # takes in the sample spatial data as other function
+{
+  # simply trying to get an interactive tile map of the same static map
+  net <- readRDS(in_network)[[1]]
+  # use for plotting number of observations
+  net_d <- left_join(net, distinct(select(in_dat, seg_id_nat, n_all_time)))
+  net_d <- net_d[!rowSums(is.na(net_d["n_all_time"])), ] 
+  #pal = mapviewpalette("")
+  map_view <- mapview(net_d, zcol =  "n_all_time",
+                      col.regions = c("yellow", "orange", "pink", "red", "purple"))
+
+  map_shot <- mapshot(map_view, url = paste0(getwd(), '/out/map.html')
+                      #,file = paste0(getwd(), "/map.png")
+                      )
+  return('out/map.html')  # hooray! this works!
 }
