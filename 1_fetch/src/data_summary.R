@@ -38,7 +38,7 @@ DRB_monthly <- function(regressionData, fileout)
   return(fileout)
 }
 
-each_site_monthly <- function(sites)
+regress_site <- function(sites)
 {
   # This should be all I need if my targets are dynamically branching
   lr <- lm(month_mean ~ year, data = sites)
