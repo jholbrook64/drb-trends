@@ -9,21 +9,16 @@ DRB_monthly <- function(regressionData, fileout)
   lr_list = list()
   month_order <- c(1:12)
   #order dataframe by increasing months
-  print("got here")
   regressionData <- regressionData[match(month_order, regressionData$month),]
-  print("got here")
   for (i in unique(regressionData$month)) 
   {
     unique_month <- regressionData %>% 
       filter(month == i) %>% 
       drop_na(month_mean)
-      
-    print("got inside loop 1")
     lr <- lm(month_mean ~ year, data = unique_month)
-    print("got inside loop 2")
     lr_list[[i]] = lr
   }
-  print("got here")
+
   pdf(fileout)
   for (i in unique(regressionData$month)) 
   {
@@ -44,3 +39,4 @@ regress_site <- function(sites)
   lr <- lm(month_mean ~ year, data = sites)
   return(lr)
 }
+

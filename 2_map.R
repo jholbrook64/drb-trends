@@ -14,6 +14,4 @@ map_targets_list <- list(
   
   tar_target(site_map_pngs,
              map_sites(month, '1_fetch/in/network.rds'), format = 'file', pattern = map(month))
-  
-  
 )

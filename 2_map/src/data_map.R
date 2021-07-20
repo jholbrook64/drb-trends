@@ -20,10 +20,9 @@ map_sites <- function(data_for_trend_analysis_month, in_network) {
   
   net_d <- left_join(net, distinct(select(data_for_trend_analysis_month, seg_id_nat, month_meanOfMax)))
 
-    # checks if there is a month in the date, assigns file name based off date month
-  # if (as.date(net_d$date) ) {
-  #   
-  # }
+    #  assigns file name based off date month
+  month <- unique(format(as.Date(data_for_trend_analysis_month$date)))
+  out_filename <- paste("2_map/out/", month, ".png", sep = "")
   
   # look at all sites with data
   p <- ggplot(net_d) +
@@ -35,7 +34,7 @@ map_sites <- function(data_for_trend_analysis_month, in_network) {
     scale_color_viridis_c(direction = -1, option = 'plasma', end = 0.95) +
     theme_bw()
   
-  ggsave('2_map/out/max_temp_sites_plot.png', p, height = 7, width = 5)
-  return('2_map/out/max_temp_sites_plot.png')
+  ggsave(out_filename, p, height = 7, width = 5)
+  return(out_filename)
   
 }

@@ -21,6 +21,10 @@ clean_monthly <- function(in_file)
     mutate(meets_criteria = n_per_month >= (days_in_month-2)) %>%
     filter(meets_criteria)
   
+  
+  dat <-  dat %>% 
+    mutate(n_years = length(unique(month_year))) %>% 
+    filter(n_years < 12)
   # readr::write_rds(dat, 'out/data_with_months.rds')
   # return('out/data_with_months.rds')
   
