@@ -33,9 +33,12 @@ summarize_targets_list <- list(
   tar_target(sites, unique_data, pattern = map(unique_data)),
   
   tar_target(regress_sites,
-              regress_site(sites))
+              regress_site(sites)),
   
-  # tar_target(each_site_regression,
-  #             each_site_monthly(files), pattern = map(files)),
+  # tar_target(regress_each_site,
+  #            regress_site(unique_data))
+  
+  tar_target(each_site_regression,
+             regress_site(sites), pattern = map(sites))
 )
 

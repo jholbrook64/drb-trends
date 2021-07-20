@@ -11,15 +11,20 @@
 ##     ~
 ## ---------------------------
 
-map_sites <- function(data_for_trend_analysis, in_network) {
+map_sites <- function(data_for_trend_analysis_month, in_network) {
   
   net <- readRDS(in_network)[[1]]
   
   # join the network with the data so you can use things like
   # the number of observations for plotting
   
-  net_d <- left_join(net, distinct(select(data_for_trend_analysis, seg_id_nat, month_meanOfMax)))
+  net_d <- left_join(net, distinct(select(data_for_trend_analysis_month, seg_id_nat, month_meanOfMax)))
 
+    # checks if there is a month in the date, assigns file name based off date month
+  # if (as.date(net_d$date) ) {
+  #   
+  # }
+  
   # look at all sites with data
   p <- ggplot(net_d) +
     geom_sf(color = 'gray') +
