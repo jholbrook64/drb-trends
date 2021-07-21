@@ -12,7 +12,7 @@
 ## ---------------------------
 
 map_sites <- function(data_for_trend_analysis_month, in_network) {
-  
+  # read the in_network piece
   net <- readRDS(in_network)[[1]]
   
   # join the network with the data so you can use things like
@@ -20,9 +20,17 @@ map_sites <- function(data_for_trend_analysis_month, in_network) {
   
   net_d <- left_join(net, distinct(select(data_for_trend_analysis_month, seg_id_nat, month_meanOfMax)))
 
-    #  assigns file name based off date month
-  month <- unique(format(as.Date(data_for_trend_analysis_month$date)))
-  out_filename <- paste("2_map/out/", month, ".png", sep = "")
+  
+  
+    #  assigns file name based off date month, is same value for each branch
+  month <- unique((data_for_trend_analysis_month$month))
+  
+  month_list <- c("January", "February", "March", "April", "May", "June", "July", "August",
+                     "September", "October", "November", "December")
+  month <- month_list[month]
+  # device` must be NULL, a string or a function.
+  out_filename <- paste("2_map/out/", month, sep = "")
+  out_filename_ext <- paste0(substitute(out_filename))
   
   # look at all sites with data
   p <- ggplot(net_d) +
@@ -33,8 +41,10 @@ map_sites <- function(data_for_trend_analysis_month, in_network) {
     # change color scale
     scale_color_viridis_c(direction = -1, option = 'plasma', end = 0.95) +
     theme_bw()
-  
-  ggsave(out_filename, p, height = 7, width = 5)
-  return(out_filename)
-  
+  #print("got here")
+  #saving file
+  ggsave(filename = month, p, device = "png", path = "2_map/out/", height = 7, width = 5)
+  print("got here")
+  return(out_filename_ext)
+  print("got here")
 }

@@ -37,6 +37,21 @@ regress_site <- function(sites)
 {
   # This should be all I need if my targets are dynamically branching
   lr <- lm(month_mean ~ year, data = sites)
-  return(lr)
+  sum_lr <- summary(lr)
+  #return(sum_lr)
+  
+  stats <- c(sum_lr$coefficients[[1]],
+             sum_lr$coefficients[[2]], .name_spec = "{outer}_{inner}")
+
+  print("got here")
+  return(stats)
+}
+
+build_statistics <- function(sum_lr)
+{
+  # takes each branch summary and returns an vector in correct format
+  stats <- c(sum_lr$coefficients[[1]],
+             sum_lr$coefficients[[2]], .name_spec = "{outer}_{inner}")
+  return(stats)
 }
 

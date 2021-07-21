@@ -9,9 +9,9 @@ map_targets_list <- list(
   #                    "September.png", "October.png", "November.png", "December.png")),
   
   # this is to create 12 plots that show the difference in the slope, represented as "year" for the regressions over each branch. 
-  tar_group_by(month,
+  tar_group_by(months,
              data_for_trend_analysis, month),
   
   tar_target(site_map_pngs,
-             map_sites(month, '1_fetch/in/network.rds'), format = 'file', pattern = map(month))
+             map_sites(months, '1_fetch/in/network.rds'), format = 'file', pattern = map(months))
 )

@@ -21,24 +21,24 @@ fetch_targest_list <- list(
   
   # use branching here to subset rows:
 summarize_targets_list <- list(
-  tar_target(month_vector,
-             order(unique(data_for_trend_analysis$month))),
-  
-  tar_target(site_vector,
-            unique(data_for_trend_analysis$seg_id_nat)),
   
   tar_group_by(unique_data,
                data_for_trend_analysis, month, seg_id_nat),
   
   tar_target(sites, unique_data, pattern = map(unique_data)),
   
-  tar_target(regress_sites,
-              regress_site(sites)),
+  # tar_target(regress_sites,
+  #             regress_site(sites)),
   
   # tar_target(regress_each_site,
   #            regress_site(unique_data))
   
-  tar_target(each_site_regression,
-             regress_site(sites), pattern = map(sites))
+  branched_regressions <- tar_target(each_site_regression,
+             regress_site(sites), pattern = map(sites)),
+  
+  # branched_regressions <- tar_target(regress_value_vector,
+  #             build_statistics(each_site_regression)),
+  
+  tar_combine(regress_data, branched_regressions)
 )
 

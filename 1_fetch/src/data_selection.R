@@ -16,15 +16,16 @@ clean_monthly <- function(in_file)
   
   # filters criteria needed for having so many days in a month. 
   dat <- dat %>%
-    mutate(month_year = as.Date(date)) %>% 
     mutate(days_in_month = lubridate::days_in_month(date)) %>% 
+    # the following will allow for n_per_month to mismatch days_in_month
     mutate(meets_criteria = n_per_month >= (days_in_month-2)) %>%
-    filter(meets_criteria)
+    filter(meets_criteria) %>% 
+    group_by(seg_id_nat) %>% 
+    mutate(n_year = length(unique(month_year))) %>% 
+    mutate(n_year = floor(n_distinct(month_year)/12)) %>% # remove floor() if it gives problems
+    ungroup() %>% 
+    filter(n_year > 12) # filter observations that have gone on for less than 12 years. 
   
-  
-  dat <-  dat %>% 
-    mutate(n_years = length(unique(month_year))) %>% 
-    filter(n_years < 12)
   # readr::write_rds(dat, 'out/data_with_months.rds')
   # return('out/data_with_months.rds')
   
