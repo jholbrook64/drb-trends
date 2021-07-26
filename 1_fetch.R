@@ -5,10 +5,10 @@ source("1_fetch/src/data_summary.R")
 tar_option_set(packages = c('tidyverse'))
 
 # this will be a vector of every unque combo of site and month!
-unique_files_month_and_site <- function(month_vector, site_vector)
-  {
-  expand.grid(month_vector, site_vector)
-  }
+# unique_files_month_and_site <- function(month_vector, site_vector)
+#   {
+#   expand.grid(month_vector, site_vector)
+#   }
 
 fetch_targest_list <- list(
   tar_target(clean_Monthly,
@@ -33,12 +33,20 @@ summarize_targets_list <- list(
   # tar_target(regress_each_site,
   #            regress_site(unique_data))
   
+  # I've seen both example where an object assigned and where an object isn't assigned
   branched_regressions <- tar_target(each_site_regression,
              regress_site(sites), pattern = map(sites)),
   
   # branched_regressions <- tar_target(regress_value_vector,
   #             build_statistics(each_site_regression)),
   
-  tar_combine(regress_data, branched_regressions)
+  combined <- tar_combine(regress_data, branched_regressions 
+                          ),
+  
+  tar_target(df_positive, write_summary_positive(combined)),
+  
+  tar_target(df_negative, write_summary_negative(combined)),
+  
+  tar_target(df_final, bind_transposed(df_positive, df_negative))
 )
 

@@ -25,7 +25,6 @@ clean_monthly <- function(in_file)
     mutate(n_year = floor(n_distinct(month_year)/12)) %>% # remove floor() if it gives problems
     ungroup() %>% 
     filter(n_year > 12) # filter observations that have gone on for less than 12 years. 
-  
   # readr::write_rds(dat, 'out/data_with_months.rds')
   # return('out/data_with_months.rds')
   
