@@ -1,4 +1,15 @@
-# data selectionn script
+## ---------------------------
+##
+## Script name: data_map.R
+##
+## Purpose of script: mapping reaches $ their annual observations
+##
+## Author: Jack Holbrook (USGS)
+##
+## ---------------------------
+## Notes:
+##     ~
+## ---------------------------
 
 clean_monthly <- function(in_file)
 {
@@ -24,11 +35,7 @@ clean_monthly <- function(in_file)
     mutate(n_year = length(unique(month_year))) %>% 
     mutate(n_year = floor(n_distinct(month_year)/12)) %>% # remove floor() if it gives problems
     ungroup() %>% 
-    filter(n_year > 12) # filter observations that have gone on for less than 12 years. 
-  # readr::write_rds(dat, 'out/data_with_months.rds')
-  # return('out/data_with_months.rds')
-  
-  # returns dataframe
+    filter(n_year > 12) 
   return(dat)
 }
 
@@ -41,15 +48,18 @@ group_time <- function(clean_monthly)  # this will be the data preparing functio
     filter(start_date_id <= as.Date("1995-01-01")) %>%
     filter(end_date_id >= as.Date("2010-01-01")) %>% 
     ungroup()
-  # this will add mean values for each month from highest,
-  # lowest and mean recorded daily temperatures
+
   data_for_trend_analysis <- data_for_trend_analysis %>% 
     mutate(month = lubridate::month(date)) %>% 
     mutate(year = lubridate::year(date)) %>% 
     group_by(month, year) %>% 
     mutate(month_mean = mean(mean_temp_c, na.rm = TRUE)) %>%
     mutate(month_meanOfMax = mean(max_temp_c, na.rm = TRUE)) %>%
-    mutate(month_meanOfMin = mean(min_temp_c, na.rm = TRUE))
+    mutate(month_meanOfMin = mean(min_temp_c, na.rm = TRUE)) %>% 
+    ungroup() %>% 
+    group_by(year) %>% 
+    mutate(annual_mean = mean(mean_temp_c, na.rm = TRUE))
   
+  # function changed and updated to add annual mean 7/27 (build work on this target!)
   return(data_for_trend_analysis)
 }

@@ -1,5 +1,15 @@
-# this is "1_fetch/src/data_summary"
-# this file will be used for summarizing outputs of linear regressions
+## ---------------------------
+##
+## Script name: data_map.R
+##
+## Purpose of script: mapping reaches $ their annual observations
+##
+## Author: Jack Holbrook (USGS)
+##
+## ---------------------------
+## Notes:
+##     ~ this is the file that runs linear regressions
+## ---------------------------
 
 DRB_monthly <- function(regressionData, fileout)
 {
@@ -48,7 +58,7 @@ regress_site <- function(sites)
     
     # ^^^  this needs to be ironed out tonight so i can present stuff to sam tomorrow  ^^^
   
-  dfstats <- data.frame("Site Segment ID" = sites$seg_id_nat[[1]], 
+  dfstats <- data.frame("seg_id_nat" = sites$seg_id_nat[[1]], 
                         "Month" = sites$month[[1]],
                         "max_temp_observed" = max(sites$max_temp_c, na.rm = TRUE),
                         "mean_monthly_temp" = mean(sites$mean_temp_c, na.rm = TRUE),
@@ -62,6 +72,43 @@ regress_site <- function(sites)
                         #"r-squared" = stats[3])
                         )
   return(dfstats)
+}
+
+flexible_linear_regression <- function(sites, type)
+{
+  #where sites is each branched target, and type is the type of linear regression that is be run 
+  if (type == 1)
+  {
+    lr <- lm(month_mean ~ year, data = sites)
+    sum_lr <- summary(lr)
+  }
+  else if (type == 2)
+  {
+    #2 will be the mean of max's. 
+    lr <- lm(month_meanOfMax ~ year, data = sites)
+    sum_lr <- summary(lr)
+  }
+  else if (type == 3)
+  {
+    lr <- lm(month_meanOfMin ~ year, data = sites)
+    sum_lr <- summary(lr)
+  }
+  else if (type == 4)
+  {
+    lr <- lm(annual_mean ~ year, data = sites)
+    sum_lr <- summary(lr)
+  }
+  stats <- c(sum_lr$coefficients[[1]],
+             sum_lr$coefficients[[2]])
+  
+  dfstats <- data.frame("seg_id_nat" = sites$seg_id_nat[[1]], 
+                        "Month" = sites$month[[1]],
+                        "max_temp_observed" = max(sites$max_temp_c, na.rm = TRUE),
+                        "mean_monthly_temp" = mean(sites$mean_temp_c, na.rm = TRUE),
+                        "min_temp_observed" = min(sites$min_temp_c, na.rm = TRUE),
+                        "Date Range" = lubridate::as.interval(start = sites$date[[1]], sites$date[[nrow(sites)]]),
+                        "Slope" = stats[2] 
+                        )
 }
 
 build_statistics <- function(sum_lr)

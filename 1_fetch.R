@@ -33,20 +33,36 @@ summarize_targets_list <- list(
   # tar_target(regress_each_site,
   #            regress_site(unique_data))
   
-  # I've seen both example where an object assigned and where an object isn't assigned
-  branched_regressions <- tar_target(each_site_regression,
-             regress_site(sites), pattern = map(sites)),
+  # I've seen both example where an object assigned and where an object isn't assigned (has either s or no s)
+  meanofmean_regressions <- tar_target(meanofmean_regression,
+                                       flexible_linear_regression(sites, 1), pattern = map(sites)),
+  
+  meanofmax_regressions <- tar_target(meanofmax_regression,
+                                      flexible_linear_regression(sites, 2), pattern = map(sites)),
+  
+  meanofmin_regressions <- tar_target(meanofmin_regression,
+                                      flexible_linear_regression(sites, 3), pattern = map(sites)),
+  
+  Annual_regressions <- tar_target(Annual_regression,
+                                   flexible_linear_regression(sites, 4), pattern = map(sites)),
   
   # branched_regressions <- tar_target(regress_value_vector,
   #             build_statistics(each_site_regression)),
   
-  combined <- tar_combine(regress_data, branched_regressions 
-                          ),
+  combined_monthMean <- tar_combine(regress_data_monthMeans, meanofmean_regressions),
   
-  tar_target(df_positive, write_summary_positive(combined)),
+  combined_monthMax <- tar_combine(regress_data_monthMaxs, meanofmax_regressions),
   
-  tar_target(df_negative, write_summary_negative(combined)),
+  combined_monthMin <- tar_combine(regress_data_monthMins, meanofmin_regressions),
   
-  tar_target(df_final, bind_transposed(df_positive, df_negative))
+  combined_annual <- tar_combine(regress_data_annual, Annual_regressions)
+  
+  # below are targets for data meta-summaries:
+  
+  # tar_target(df_positive, write_summary_positive(regress_data)),
+  # 
+  # tar_target(df_negative, write_summary_negative(regress_data)),
+  # 
+  # tar_target(df_final, bind_transposed(df_positive, df_negative))
 )
 

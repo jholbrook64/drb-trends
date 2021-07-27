@@ -18,12 +18,12 @@ map_sites <- function(data_for_trend_analysis_month, in_network) {
   # join the network with the data so you can use things like
   # the number of observations for plotting
   
-  net_d <- left_join(net, select(data_for_trend_analysis_month, seg_id_nat = Site.Segment.ID, Slope))
+  net_d <- left_join(net, select(data_for_trend_analysis_month, seg_id_nat = seg_id_nat, Slope))
   colnames(net_d)[12] <- "Warming_trend_degC_Year"
     #  assigns file name based off date month, is same value for each branch
   month <- unique((data_for_trend_analysis_month$Month))
   
-  month_list <- c("January", "February", "March", "April", "May", "June", "July", "August",
+    month_list <- c("January", "February", "March", "April", "May", "June", "July", "August",
                      "September", "October", "November", "December")
   month <- month_list[month]
   # device` must be NULL, a string or a function.
@@ -42,7 +42,5 @@ map_sites <- function(data_for_trend_analysis_month, in_network) {
   #print("got here")
   #saving file
   ggsave(filename = month, p, device = "png", path = "2_map/out/", height = 7, width = 5)
-  print("got here")
   return(out_filename_ext)
-  print("got here")
 }
