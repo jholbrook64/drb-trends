@@ -16,7 +16,7 @@ fetch_targest_list <- list(
   
   tar_target(data_for_trend_analysis,                            
              group_time(clean_Monthly))
-)
+  )
   # end functions from "1_fetch/src/data_selection"
   
   # use branching here to subset rows:
@@ -27,13 +27,6 @@ summarize_targets_list <- list(
   
   tar_target(sites, unique_data, pattern = map(unique_data)),
   
-  # tar_target(regress_sites,
-  #             regress_site(sites)),
-  
-  # tar_target(regress_each_site,
-  #            regress_site(unique_data))
-  
-  # I've seen both example where an object assigned and where an object isn't assigned (has either s or no s)
   meanofmean_regressions <- tar_target(meanofmean_regression,
                                        flexible_linear_regression(sites, 1), pattern = map(sites)),
   
@@ -44,17 +37,18 @@ summarize_targets_list <- list(
                                       flexible_linear_regression(sites, 3), pattern = map(sites)),
   
   Annual_regressions <- tar_target(Annual_regression,
-                                   flexible_linear_regression(sites, 4), pattern = map(sites)),
+                                   flexible_linear_regression(sites, 4), pattern = map(sites))
+  )
+  # end branched regressions targets
   
-  # branched_regressions <- tar_target(regress_value_vector,
-  #             build_statistics(each_site_regression)),
+  combine_targets_list <- list(
   
   combined_monthMean <- tar_combine(regress_data_monthMeans, meanofmean_regressions),
   
   combined_monthMax <- tar_combine(regress_data_monthMaxs, meanofmax_regressions),
   
   combined_monthMin <- tar_combine(regress_data_monthMins, meanofmin_regressions),
-  
+
   combined_annual <- tar_combine(regress_data_annual, Annual_regressions)
   
   # below are targets for data meta-summaries:
