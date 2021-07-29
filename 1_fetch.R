@@ -22,22 +22,25 @@ fetch_targest_list <- list(
   # use branching here to subset rows:
 summarize_targets_list <- list(
   
-  tar_group_by(unique_data,
+  tar_group_by(month_data,
                data_for_trend_analysis, month, seg_id_nat),
   
-  tar_target(sites, unique_data, pattern = map(unique_data)),
+  tar_group_by(year_data,
+               data_fro_trend_analysis, year, seg_id_nat)
+  
+  #tar_target(sites, unique_data, pattern = map(unique_data)),
   
   meanofmean_regressions <- tar_target(meanofmean_regression,
-                                       flexible_linear_regression(sites, 1), pattern = map(sites)),
+                                       flexible_linear_regression(month_data, 1), pattern = map(month_data), iteration = "group"),
   
   meanofmax_regressions <- tar_target(meanofmax_regression,
-                                      flexible_linear_regression(sites, 2), pattern = map(sites)),
+                                      flexible_linear_regression(month_data, 2), pattern = map(month_data), iteration = "group"),
   
   meanofmin_regressions <- tar_target(meanofmin_regression,
-                                      flexible_linear_regression(sites, 3), pattern = map(sites)),
+                                      flexible_linear_regression(month_data, 3), pattern = map(month_data), iteration = "group"),
   
   Annual_regressions <- tar_target(Annual_regression,
-                                   flexible_linear_regression(sites, 4), pattern = map(sites))
+                                   flexible_linear_regression(sites, 4), pattern = map(month_data), iteration = "group")
   )
   # end branched regressions targets
   
@@ -49,7 +52,18 @@ summarize_targets_list <- list(
   
   combined_monthMin <- tar_combine(regress_data_monthMins, meanofmin_regressions),
 
-  combined_annual <- tar_combine(regress_data_annual, Annual_regressions)
+  combined_annual <- tar_combine(regress_data_annual, Annual_regressions),
+  
+  # regression_table <- list(regress_data_monthMeans, regress_data_monthMaxs, regress_data_monthMins, 
+  #                          regress_data_annual),
+  
+  regression_table <- list(combined_monthMean, combined_monthMax, combined_monthMin,
+                           combined_annual),
+  
+  for (i in length(regression_table)) {
+    tar_target(table_summary, summarize_table(regression_table[i]))
+  }
+  
   
   # below are targets for data meta-summaries:
   

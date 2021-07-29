@@ -58,7 +58,8 @@ group_time <- function(clean_monthly)  # this will be the data preparing functio
     mutate(month_meanOfMin = mean(min_temp_c, na.rm = TRUE)) %>% 
     ungroup() %>% 
     group_by(year) %>% 
-    mutate(annual_mean = mean(mean_temp_c, na.rm = TRUE))
+    summarize()
+    #mutate(annual_mean = mean(mean_temp_c, na.rm = TRUE))
   
   # function changed and updated to add annual mean 7/27 (build work on this target!)
   return(data_for_trend_analysis)

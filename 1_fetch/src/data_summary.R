@@ -69,6 +69,27 @@ flexible_linear_regression <- function(sites, type)
   return(dfstats)
 }
 
+summarize_table <- function(regression_table)
+{
+  # sum_by <- list("summary" = 
+  #                  list("min slope" = ~ min(),
+  #                       "max slope" = ~ max(),
+  #                       ))
+  
+  summaryT <- regression_table %>% 
+    group_by(seg_id_nat, months) %>% 
+    summarise(Min_slope = min(Slope), 
+              Max_slope = max(Slope),
+              strongest_correlation = max(r),
+              max_temp_observed = max(max_temp_observed),
+              min_temp_observed = min(min_temp_observed),
+              sd_across_branches = sd(mean_monthly_temp),
+              Quartile_range_across_branches = IQR(mean_monthly_temp),
+              longest_observation = max(years))
+  
+  return(summaryT)
+}
+
 write_summary_positive <- function(dfstats)
 {
 #These will only include metrics from the month of July since that is the hottest month on record
