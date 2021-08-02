@@ -44,13 +44,31 @@ flexible_linear_regression <- function(sites, type)
   }
   else if (type == 4)
   {
+    # kept as of 12:34 pm on monday 8-2
+    # here there is a problem of one of the targets having all NA values
+    if(all(is.nan(sites$annual_mean)))
+    {
+      return(  dfstats <- data.frame("seg_id_nat" = sites$seg_id_nat[[1]], 
+                                     "Month" = sites$month[[1]],
+                                     "max_temp_observed" = 0,
+                                     "mean_monthly_temp" = 0,
+                                     "min_temp_observed" = 0,
+                                     "Date Range" = lubridate::as.interval(start = sites$date[[1]], sites$date[[nrow(sites)]]),
+                                     "years" = sites$n_year[[1]],
+                                     "Slope" = 0,
+                                     "r" = 0,
+                                     "r2" = 0
+      ))
+    }
+    else{
     lr <- lm(annual_mean ~ year, data = sites)
     sum_lr <- summary(lr)
     
-    r_cor <- cor(sites$year, sites$annual_mean) 
+    r_cor <- cor(sites$year, sites$annual_mean, na.rm = TRUE) 
     max_temp <-  max(sites$annual_mean, na.rm = TRUE)
     mean_temp <- mean(sites$annual_mean, na.rm = TRUE)
     min_temp <-  min(sites$annual_mean, na.rm = TRUE)
+    }
   }
   stats <- c(sum_lr$coefficients[[1]],
              sum_lr$coefficients[[2]])

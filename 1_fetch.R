@@ -1,34 +1,43 @@
-# targets file for fetching data
+## ---------------------------
+##
+## Script name: 1_fetch.R
+##
+## Purpose of script: mapping reaches $ their annual observations
+##
+## Author: Jack Holbrook (USGS)
+##
+## ---------------------------
+## Notes: targets file for data fetches
+##     ~
+## ---------------------------
+
 source("1_fetch/src/data_selection.R")
 source("1_fetch/src/data_summary.R")
 
 tar_option_set(packages = c('tidyverse'))
 
-# this will be a vector of every unque combo of site and month!
-# unique_files_month_and_site <- function(month_vector, site_vector)
-#   {
-#   expand.grid(month_vector, site_vector)
-#   }
-
 fetch_targest_list <- list(
   tar_target(clean_Monthly,
              clean_monthly('1_fetch/in/obs_temp_drb.rds')),
   
-  tar_target(data_for_trend_analysis,                            
-             group_time(clean_Monthly))
-  )
-  # end functions from "1_fetch/src/data_selection"
+  tar_target(select_data,
+             filter_data(clean_Monthly)),
   
-  # use branching here to subset rows:
+  tar_target(data_for_trend_analysis,                            
+             group_time(select_data)),
+  
+  tar_target(year_trend_analysis,
+             group_year(select_data))
+  )
+  # end data cleaning targets
+  
 summarize_targets_list <- list(
   
   tar_group_by(month_data,
                data_for_trend_analysis, month, seg_id_nat),
   
   tar_group_by(year_data,
-               data_fro_trend_analysis, year, seg_id_nat)
-  
-  #tar_target(sites, unique_data, pattern = map(unique_data)),
+               year_trend_analysis, year, seg_id_nat),
   
   meanofmean_regressions <- tar_target(meanofmean_regression,
                                        flexible_linear_regression(month_data, 1), pattern = map(month_data), iteration = "group"),
@@ -40,7 +49,7 @@ summarize_targets_list <- list(
                                       flexible_linear_regression(month_data, 3), pattern = map(month_data), iteration = "group"),
   
   Annual_regressions <- tar_target(Annual_regression,
-                                   flexible_linear_regression(sites, 4), pattern = map(month_data), iteration = "group")
+                                   flexible_linear_regression(year_data, 4), pattern = map(year_data), iteration = "group")
   )
   # end branched regressions targets
   
@@ -52,25 +61,20 @@ summarize_targets_list <- list(
   
   combined_monthMin <- tar_combine(regress_data_monthMins, meanofmin_regressions),
 
-  combined_annual <- tar_combine(regress_data_annual, Annual_regressions),
+  combined_annual <- tar_combine(regress_data_annual, Annual_regressions)
   
-  # regression_table <- list(regress_data_monthMeans, regress_data_monthMaxs, regress_data_monthMins, 
-  #                          regress_data_annual),
-  
-  regression_table <- list(combined_monthMean, combined_monthMax, combined_monthMin,
-                           combined_annual),
-  
-  for (i in length(regression_table)) {
-    tar_target(table_summary, summarize_table(regression_table[i]))
-  }
-  
-  
-  # below are targets for data meta-summaries:
-  
-  # tar_target(df_positive, write_summary_positive(regress_data)),
+  # other method of making targets list - I believe this is incorrect
+  # regression_table <- list(regress_data_monthMeans, regress_data_monthMaxs, regress_data_monthMins,
+  #                           regress_data_annual)
+
+  # regression_table <- list(combined_monthMean, combined_monthMax, combined_monthMin,
+  #                         combined_annual)
+
+  # this should be the loop-through function that meakes a meta-syummary for each dataframe
+  # for (i in length(regression_table)) {
+  #   tar_target(table_summary, summarize_table(regression_table[i]))
+  # }
   # 
-  # tar_target(df_negative, write_summary_negative(regress_data)),
-  # 
-  # tar_target(df_final, bind_transposed(df_positive, df_negative))
+
 )
 

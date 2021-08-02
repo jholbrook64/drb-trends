@@ -1,4 +1,16 @@
-# targets file for mapping data
+## ---------------------------
+##
+## Script name: 2_map.R
+##
+## Purpose of script: mapping reaches $ their annual observations
+##
+## Author: Jack Holbrook (USGS)
+##
+## ---------------------------
+## Notes: targets file for creating visualizations
+##     ~
+## ---------------------------
+
 source("2_map/src/data_map.R")
 
 tar_option_set(packages = c('tidyverse', 'sf'))

@@ -2,7 +2,7 @@
 ##
 ## Script name: data_map.R
 ##
-## Purpose of script: mapping reaches $ their annual observations
+## Purpose of script: selecting and filtering data from original data-set.
 ##
 ## Author: Jack Holbrook (USGS)
 ##
@@ -28,7 +28,6 @@ clean_monthly <- function(in_file)
   # filters criteria needed for having so many days in a month. 
   dat <- dat %>%
     mutate(days_in_month = lubridate::days_in_month(date)) %>% 
-    # the following will allow for n_per_month to mismatch days_in_month
     mutate(meets_criteria = n_per_month >= (days_in_month-2)) %>%
     filter(meets_criteria) %>% 
     group_by(seg_id_nat) %>% 
@@ -39,28 +38,49 @@ clean_monthly <- function(in_file)
   return(dat)
 }
 
-group_time <- function(clean_monthly)  # this will be the data preparing function!
+filter_data <- function(clean_monthly)
 {
-  data_for_trend_analysis <- clean_monthly %>% 
+ # the reason for record deduction here is the function removes 
+ # records from the data that are outside our analyssi timeframe
+  select_data <- clean_monthly %>% 
     group_by(seg_id_nat) %>% 
     mutate(start_date_id = min(date)) %>% 
     mutate(end_date_id = max(date)) %>% 
     filter(start_date_id <= as.Date("1995-01-01")) %>%
     filter(end_date_id >= as.Date("2010-01-01")) %>% 
     ungroup()
+  
+  return(select_data)
+}
 
-  data_for_trend_analysis <- data_for_trend_analysis %>% 
+group_time <- function(select_data)
+{
+  data_for_trend_analysis <- select_data %>% 
     mutate(month = lubridate::month(date)) %>% 
     mutate(year = lubridate::year(date)) %>% 
     group_by(month, year) %>% 
+    # summarize(month_mean = mean(mean_temp_c, na.rm = TRUE),
+    #           month_meanOfMax = mean(max_temp_c, na.rm = TRUE),
+    #           month_meanOfMin = mean(min_temp_c, na.rm = TRUE))
     mutate(month_mean = mean(mean_temp_c, na.rm = TRUE)) %>%
     mutate(month_meanOfMax = mean(max_temp_c, na.rm = TRUE)) %>%
-    mutate(month_meanOfMin = mean(min_temp_c, na.rm = TRUE)) %>% 
-    ungroup() %>% 
-    group_by(year) %>% 
-    summarize()
-    #mutate(annual_mean = mean(mean_temp_c, na.rm = TRUE))
+    mutate(month_meanOfMin = mean(min_temp_c, na.rm = TRUE))
   
-  # function changed and updated to add annual mean 7/27 (build work on this target!)
   return(data_for_trend_analysis)
+}
+
+group_year <- function(select_data)
+{
+  year_trend_analysis <- select_data %>% 
+    mutate(month = lubridate::month(date)) %>% 
+    mutate(year = lubridate::year(date)) %>%
+    group_by(year) %>% 
+    # summarize(annual_mean = mean(mean_temp_c, na.rm = TRUE),
+    #           annual_meanOfMax = mean(max_temp_c, na.rm = TRUE),
+    #           annual_meanOfMin = mean(min_temp_c, na.rm = TRUE))
+    mutate(annual_mean = mean(mean_temp_c, na.rm = TRUE)) %>%
+    mutate(annual_meanOfMax = mean(max_temp_c, na.rm = TRUE)) %>%
+    mutate(annual_meanOfMin = mean(min_temp_c, na.rm = TRUE))
+  
+  return(year_trend_analysis)
 }
