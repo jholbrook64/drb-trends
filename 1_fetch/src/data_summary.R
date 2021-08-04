@@ -18,7 +18,7 @@ flexible_linear_regression <- function(sites, type)
   {
     lr <- lm(month_mean ~ year, data = sites)
     sum_lr <- summary(lr)
-    r_cor <- cor(sites$year, sites$month_mean) 
+    rs <- sum_lr$r.squared
     max_temp <-  max(sites$month_mean, na.rm = TRUE)
     mean_temp <- mean(sites$month_mean, na.rm = TRUE)
     min_temp <-  min(sites$month_mean, na.rm = TRUE)
@@ -28,7 +28,7 @@ flexible_linear_regression <- function(sites, type)
     #2 will be the mean of max's. 
     lr <- lm(month_meanOfMax ~ year, data = sites)
     sum_lr <- summary(lr)
-    r_cor <- cor(sites$year, sites$month_meanOfMax) 
+    rs <- sum_lr$r.squared
     max_temp <-  max(sites$month_meanOfMax, na.rm = TRUE)
     mean_temp <- mean(sites$month_meanOfMax, na.rm = TRUE)
     min_temp <-  min(sites$month_meanOfMax, na.rm = TRUE)
@@ -37,7 +37,7 @@ flexible_linear_regression <- function(sites, type)
   {
     lr <- lm(month_meanOfMin ~ year, data = sites)
     sum_lr <- summary(lr)
-    r_cor <- cor(sites$year, sites$month_meanOfMin) 
+    rs <- sum_lr$r.squared 
     max_temp <-  max(sites$month_meanOfMin, na.rm = TRUE)
     mean_temp <- mean(sites$month_meanOfMin, na.rm = TRUE)
     min_temp <-  min(sites$month_meanOfMin, na.rm = TRUE)
@@ -64,7 +64,8 @@ flexible_linear_regression <- function(sites, type)
     lr <- lm(annual_mean ~ year, data = sites)
     sum_lr <- summary(lr)
     
-    r_cor <- cor(sites$year, sites$annual_mean, na.rm = TRUE) 
+    #r_cor <- cor(sites$year, sites$annual_mean, use="everything") 
+    rs <- sum_lr$r.squared
     max_temp <-  max(sites$annual_mean, na.rm = TRUE)
     mean_temp <- mean(sites$annual_mean, na.rm = TRUE)
     min_temp <-  min(sites$annual_mean, na.rm = TRUE)
@@ -81,19 +82,14 @@ flexible_linear_regression <- function(sites, type)
                         "Date Range" = lubridate::as.interval(start = sites$date[[1]], sites$date[[nrow(sites)]]),
                         "years" = sites$n_year[[1]],
                         "Slope" = stats[2],
-                        "r" = r_cor,
-                        "r2" = r_cor*r_cor
+                        #"r" = rs^(1/2),
+                        "r2" = rs
                         )
   return(dfstats)
 }
 
 summarize_table <- function(regression_table)
 {
-  # sum_by <- list("summary" = 
-  #                  list("min slope" = ~ min(),
-  #                       "max slope" = ~ max(),
-  #                       ))
-  
   summaryT <- regression_table %>% 
     group_by(seg_id_nat, months) %>% 
     summarise(Min_slope = min(Slope), 

@@ -17,6 +17,14 @@ tar_option_set(packages = c('tidyverse'))
 
 meta_summaries <- list(
   
+  tar_target(MonthMean_summary, summarize_table(regress_data_monthMeans)),
+  
+  tar_target(MonthMax_summary, summarize_table(regress_data_monthMaxs)),
+  
+  tar_target(MonthMin_summary, summarize_table(regress_data_monthMins)),
+  
+  tar_target(Annual_summary, summarize_table(regress_data_annual))
+  
   # other method of making targets list - I believe this is incorrect
   # regression_table <- list(regress_data_monthMeans, regress_data_monthMaxs, regress_data_monthMins,
   #                           regress_data_annual)
