@@ -11,11 +11,16 @@
 ##     ~
 ## ---------------------------
 
-source("3_summarize/src/data_analysis.R")
+#source("3_summarize/src/data_analysis.R")
+source("1_fetch/src/data_summary.R")
 
 tar_option_set(packages = c('tidyverse'))
 
 meta_summaries <- list(
+  
+  # tar_target(look_at_this_segment, month_data %>% 
+  #              filter(seg_id_nat == 1718) %>% 
+  #              fiulter(Month == 3)),
   
   tar_target(MonthMean_summary, summarize_table(regress_data_monthMeans)),
   

@@ -20,11 +20,8 @@ map_sites <- function(data_for_trend_analysis_month, in_network) {
   
   net_d <- left_join(net, select(data_for_trend_analysis_month, seg_id_nat = seg_id_nat, Slope))
   
-  names(net_d)[names(net_d) == 'Slope'] <- 'Warming_Trend_degC_Year'
-  
-  #colnames(net_d$Slope) <- "Warming_Trend_degC_Year"
-  #colnames(net_d)[12] <- "Warming_trend_degC_Year"
-  
+  names(net_d)[names(net_d) == 'Slope'] <- 'Warming Trend degC Year'
+
   #  assigns file name based off date month, is same value for each branch
   month <- unique((data_for_trend_analysis_month$Month))
   month_list <- c("January", "February", "March", "April", "May", "June", "July", "August",
@@ -34,21 +31,25 @@ map_sites <- function(data_for_trend_analysis_month, in_network) {
   # device` must be NULL, a string or a function.
   out_filename <- paste("2_map/out/", month, sep = "")
   out_filename_ext <- paste0(substitute(out_filename))
-  
+
   # look at all sites with data
+  background <- map_data("state")
   p <- ggplot(net_d) +
     geom_sf(color = 'gray') +
     # filter to sites with a n_all_time value, which indicates at least some data
     # color by how much data a segment has
-    geom_sf(data = filter(net_d, !is.na(Warming_Trend_degC_Year)), aes(color = Warming_Trend_degC_Year)) +
+    #geom_sf(data = filter(net_d, !is.na('Warming Trend degC Year')), aes(color = 'Warming Trend degC Year')) +
     #geom_label(data = seg_id_nat, )
+    geom_polygon(data = background, aes(x=long, y=lat, group=group),
+                 color="black", fill="gray") +
+    # coord_sf(xlim = c(-77, -75), ylim = c(38.8, 43), expand = FALSE) +
     scale_color_viridis_c(direction = -1, option = 'plasma', end = 0.95) +
     theme_bw() +
     ggtitle(paste(title, monthname, sep = ""))+ 
     xlab(expression(paste(Longitude^o,~'N'))) +
     ylab(expression(paste(Latitude^o,~'W')))
-  #print("got here")
+
   #saving file
-  ggsave(filename = month, p, device = "png", path = "2_map/out/", height = 7, width = 5)
+  ggsave(filename = monthname, p, device = "png", path = "2_map/out/", height = 7, width = 5)
   return(out_filename_ext)
 }

@@ -28,13 +28,14 @@ clean_monthly <- function(in_file)
   # filters criteria needed for having so many days in a month. 
   dat <- dat %>%
     mutate(days_in_month = lubridate::days_in_month(date)) %>% 
+    mutate(month = lubridate::month(date)) %>% 
     mutate(meets_criteria = n_per_month >= (days_in_month-2)) %>%
     filter(meets_criteria) %>% 
-    group_by(seg_id_nat) %>% 
+    group_by(seg_id_nat, month) %>% 
     mutate(n_year = length(unique(month_year))) %>% 
-    mutate(n_year = floor(n_distinct(month_year)/12)) %>% # remove floor() if it gives problems
+    #mutate(n_year = floor(n_distinct(month_year)/12)) %>% # remove floor() if it gives problems
     ungroup() %>% 
-    filter(n_year > 12) 
+    filter(n_year >= 12) 
   return(dat)
 }
 
@@ -56,7 +57,6 @@ filter_data <- function(clean_monthly)
 group_time <- function(select_data)
 {
   data_for_trend_analysis <- select_data %>% 
-    mutate(month = lubridate::month(date)) %>% 
     mutate(year = lubridate::year(date)) %>% 
     group_by(month, year) %>% 
     # summarize(month_mean = mean(mean_temp_c, na.rm = TRUE),
@@ -72,7 +72,6 @@ group_time <- function(select_data)
 group_year <- function(select_data)
 {
   year_trend_analysis <- select_data %>% 
-    mutate(month = lubridate::month(date)) %>% 
     mutate(year = lubridate::year(date)) %>%
     group_by(year) %>% 
     # summarize(annual_mean = mean(mean_temp_c, na.rm = TRUE),
