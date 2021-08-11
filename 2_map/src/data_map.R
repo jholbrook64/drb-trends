@@ -19,7 +19,7 @@ map_sites <- function(data_for_trend_analysis_month, in_network) {
   # the number of observations for plotting
   
   net_d <- left_join(net, select(data_for_trend_analysis_month, seg_id_nat = seg_id_nat, Slope))
-  
+  net_d$Slope = as.numeric(levels(net_d$Slope))[[net_d$Slope]]
   names(net_d)[names(net_d) == 'Slope'] <- 'Warming Trend degC Year'
 
   #  assigns file name based off date month, is same value for each branch
@@ -32,24 +32,28 @@ map_sites <- function(data_for_trend_analysis_month, in_network) {
   out_filename <- paste("2_map/out/", month, sep = "")
   out_filename_ext <- paste0(substitute(out_filename))
 
-  # look at all sites with data
+  # look at all sites with data                              # below makes the geom object, the thing is different bc I eliminated aes
   background <- map_data("state")
   p <- ggplot(net_d) +
     geom_sf(color = 'gray') +
     # filter to sites with a n_all_time value, which indicates at least some data
-    # color by how much data a segment has
-    #geom_sf(data = filter(net_d, !is.na('Warming Trend degC Year')), aes(color = 'Warming Trend degC Year')) +
-    #geom_label(data = seg_id_nat, )
+   
+     # color by how much data a segment has
+  
+    
+    
+    geom_sf(data = filter(net_d, !is.na('Warming Trend degC Year')), aes(color = 'Warming Trend degC Year')) +
     geom_polygon(data = background, aes(x=long, y=lat, group=group),
                  color="black", fill="gray") +
-    # coord_sf(xlim = c(-77, -75), ylim = c(38.8, 43), expand = FALSE) +
-    scale_color_viridis_c(direction = -1, option = 'plasma', end = 0.95) +
+    #coord_sf(xlim = c(-77, -75), ylim = c(38.8, 43), expand = FALSE) +
+    scale_color_viridis_c(direction = -1, option = 'plasma', end = 1) +
     theme_bw() +
     ggtitle(paste(title, monthname, sep = ""))+ 
     xlab(expression(paste(Longitude^o,~'N'))) +
     ylab(expression(paste(Latitude^o,~'W')))
 
   #saving file
-  ggsave(filename = monthname, p, device = "png", path = "2_map/out/", height = 7, width = 5)
-  return(out_filename_ext)
+  this_filename <-  file.path('2_map', 'out', paste0(monthname, '.png'))
+  ggsave(filename = this_filename, p, device = "png", path = "2_map/out/", height = 7, width = 5)
+  return(this_filename)
 }

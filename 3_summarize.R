@@ -18,17 +18,26 @@ tar_option_set(packages = c('tidyverse'))
 
 meta_summaries <- list(
   
-  # tar_target(look_at_this_segment, month_data %>% 
-  #              filter(seg_id_nat == 1718) %>% 
-  #              fiulter(Month == 3)),
-  
   tar_target(MonthMean_summary, summarize_table(regress_data_monthMeans)),
   
   tar_target(MonthMax_summary, summarize_table(regress_data_monthMaxs)),
   
   tar_target(MonthMin_summary, summarize_table(regress_data_monthMins)),
   
-  tar_target(Annual_summary, summarize_table(regress_data_annual))
+  tar_target(Annual_summary, summarize_table(regress_data_annual)),
+  
+  
+  # this simply load the highest trend target, I want to inlcudee this in my analysis
+  tar_target(look_at_this_segment3, month_data %>% 
+               filter(seg_id_nat == 2338) %>% 
+               filter(month == 5)),
+  tar_target(look_at_this_segment4, month_data %>%
+               filter(seg_id_nat == 1573) %>%
+               filter(month == 5)),
+  tar_target(look_at_this_segment5, month_data %>%
+               filter(seg_id_nat == 1568) %>%
+               filter(month == 10))
+              # min
   
   # other method of making targets list - I believe this is incorrect
   # regression_table <- list(regress_data_monthMeans, regress_data_monthMaxs, regress_data_monthMins,

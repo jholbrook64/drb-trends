@@ -32,7 +32,7 @@ clean_monthly <- function(in_file)
     mutate(meets_criteria = n_per_month >= (days_in_month-2)) %>%
     filter(meets_criteria) %>% 
     group_by(seg_id_nat, month) %>% 
-    mutate(n_year = length(unique(month_year))) %>% 
+    mutate(n_year = n_distinct(month_year)) %>% 
     #mutate(n_year = floor(n_distinct(month_year)/12)) %>% # remove floor() if it gives problems
     ungroup() %>% 
     filter(n_year >= 12) 

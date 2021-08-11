@@ -91,10 +91,10 @@ flexible_linear_regression <- function(sites, type)
 summarize_table <- function(regression_table)
 {
   summaryT <- regression_table %>% 
-    group_by(seg_id_nat, months) %>% 
+    group_by(Month) %>% 
     summarise(Min_slope = min(Slope), 
               Max_slope = max(Slope),
-              strongest_correlation = max(r),
+              strongest_correlation = max(r2),
               max_temp_observed = max(max_temp_observed),
               min_temp_observed = min(min_temp_observed),
               sd_across_branches = sd(mean_monthly_temp),

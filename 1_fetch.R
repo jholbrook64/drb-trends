@@ -53,11 +53,11 @@ summarize_targets_list <- list(
   
   # this simply load the highest trend target, I want to inlcudee this in my analysis
   tar_target(look_at_this_segment, month_data %>% 
-               filter(seg_id_nat == 1718) %>% 
-               filter(month == 3)),
+               filter(seg_id_nat == 2338) %>% 
+               filter(month == 5)),
   tar_target(look_at_this_segment2, month_data %>%
-               filter(seg_id_nat == 1718) %>%
-               filter(month == 7))
+               filter(seg_id_nat == 1573) %>%
+               filter(month == 10))
   )
   # end branched regressions targets
   
