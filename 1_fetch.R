@@ -37,7 +37,7 @@ summarize_targets_list <- list(
                data_for_trend_analysis, month, seg_id_nat),
   
   tar_group_by(year_data,
-               year_trend_analysis, year, seg_id_nat),
+               year_trend_analysis, seg_id_nat),
   
   meanofmean_regressions <- tar_target(meanofmean_regression,
                                        flexible_linear_regression(month_data, 1), pattern = map(month_data), iteration = "group"),
@@ -49,15 +49,7 @@ summarize_targets_list <- list(
                                       flexible_linear_regression(month_data, 3), pattern = map(month_data), iteration = "group"),
   
   Annual_regressions <- tar_target(Annual_regression,
-                                   flexible_linear_regression(year_data, 4), pattern = map(year_data), iteration = "group"),
-  
-  # this simply load the highest trend target, I want to inlcudee this in my analysis
-  tar_target(look_at_this_segment, month_data %>% 
-               filter(seg_id_nat == 2338) %>% 
-               filter(month == 5)),
-  tar_target(look_at_this_segment2, month_data %>%
-               filter(seg_id_nat == 1573) %>%
-               filter(month == 10))
+                                   flexible_linear_regression(year_data, 4), pattern = map(year_data), iteration = "group")
   )
   # end branched regressions targets
   

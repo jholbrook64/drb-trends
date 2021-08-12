@@ -26,6 +26,10 @@ meta_summaries <- list(
   
   tar_target(Annual_summary, summarize_table(regress_data_annual)),
   
+  # descriptive stats - create a summary of mins across annual branches:
+  tar_target(descrip_annual, 
+             summary(year_data$annual_mean),  pattern = map(year_data), iteration = "group"),
+  
   
   # this simply load the highest trend target, I want to inlcudee this in my analysis
   tar_target(look_at_this_segment3, month_data %>% 

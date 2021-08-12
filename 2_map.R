@@ -21,6 +21,12 @@ map_targets_list <- list(
   #                    "September.png", "October.png", "November.png", "December.png")),
   
   # this is to create 12 plots that show the difference in the slope, represented as "year" for the regressions over each branch. 
+  tar_target(boxplots_year, 
+             boxplot_func(year_data, 1)),
+  
+  tar_target(boxplots_month, 
+             boxplot_func(month_data, 2)),
+  
   tar_group_by(months,
                meanofmean_regression, Month),
 
