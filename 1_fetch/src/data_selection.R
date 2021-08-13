@@ -41,14 +41,13 @@ clean_monthly <- function(in_file)
 
 filter_data <- function(clean_monthly)
 {
- # the reason for record deduction here is the function removes 
- # records from the data that are outside our analyssi timeframe
   select_data <- clean_monthly %>% 
     group_by(seg_id_nat) %>% 
     mutate(start_date_id = min(date)) %>% 
     mutate(end_date_id = max(date)) %>% 
     filter(start_date_id <= as.Date("1995-01-01")) %>%
     filter(end_date_id >= as.Date("2010-01-01")) %>% 
+    filter(end_date_id >= as.Date("2020-12-31")) %>% 
     ungroup()
   
   return(select_data)
@@ -59,9 +58,6 @@ group_time <- function(select_data)
   data_for_trend_analysis <- select_data %>% 
     mutate(year = lubridate::year(date)) %>% 
     group_by(month, year) %>% 
-    # summarize(month_mean = mean(mean_temp_c, na.rm = TRUE),
-    #           month_meanOfMax = mean(max_temp_c, na.rm = TRUE),
-    #           month_meanOfMin = mean(min_temp_c, na.rm = TRUE))
     mutate(month_mean = mean(mean_temp_c, na.rm = TRUE)) %>%
     mutate(month_meanOfMax = mean(max_temp_c, na.rm = TRUE)) %>%
     mutate(month_meanOfMin = mean(min_temp_c, na.rm = TRUE))
@@ -74,12 +70,10 @@ group_year <- function(select_data)
   year_trend_analysis <- select_data %>% 
     mutate(year = lubridate::year(date)) %>%
     group_by(year) %>% 
-    # summarize(annual_mean = mean(mean_temp_c, na.rm = TRUE),
-    #           annual_meanOfMax = mean(max_temp_c, na.rm = TRUE),
-    #           annual_meanOfMin = mean(min_temp_c, na.rm = TRUE))
     mutate(annual_mean = mean(mean_temp_c, na.rm = TRUE)) %>%
     mutate(annual_meanOfMax = mean(max_temp_c, na.rm = TRUE)) %>%
-    mutate(annual_meanOfMin = mean(min_temp_c, na.rm = TRUE))
+    mutate(annual_meanOfMin = mean(min_temp_c, na.rm = TRUE)) %>% 
+    drop_na(annual_mean, annual_meanOfMax, annual_meanOfMin)
   
   return(year_trend_analysis)
 }
