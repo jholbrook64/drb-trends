@@ -11,29 +11,19 @@
 ##     ~
 ## ---------------------------
 
-map_sites <- function(data_for_trend_analysis_month, in_network) {
-  # read the in_network piece
+map_sites <- function(data_for_trend_analysis_month, in_network) 
+  {
   net <- readRDS(in_network)[[1]]
-  
-  # join the network with the data so you can use things like
-  # the number of observations for plotting
-  
+  # joins attribute w/ spatial data
   net_d <- left_join(net, select(data_for_trend_analysis_month, seg_id_nat = seg_id_nat, Slope))
-  # this does not do what I think it does
-  # net_d$Slope = as.numeric(levels(net_d$Slope))[[net_d$Slope]]
+  # reassign variable name for a better legend
   names(net_d)[names(net_d) == 'Slope'] <- 'Warming Trend degC Year'
-
   #  assigns file name based off date month, is same value for each branch
   month <- unique((data_for_trend_analysis_month$Month))
   month_list <- c("January", "February", "March", "April", "May", "June", "July", "August",
                      "September", "October", "November", "December")
   monthname <- month_list[month]
   title <- "DRB wide warming trend for the month of "
-  # device` must be NULL, a string or a function.
-
-  # look at all sites with data                              # below makes the geom object, the thing is different bc I eliminated aes
-  browser()
-  
   background <- st_as_sf(maps::map("state", plot = FALSE, fill = TRUE))
   
   p <- ggplot(net_d) +
@@ -45,16 +35,18 @@ map_sites <- function(data_for_trend_analysis_month, in_network) {
     geom_sf(data = background, fill="white") +
     # geom_polygon(data = background, aes(x=long, y=lat, group=group),
     #             color="black", fill="gray") +
-    coord_sf(xlim = c(-77, -0), ylim = c(0, 43), expand = FALSE) +
+    # coord_sf(xlim = c(-77, -0), ylim = c(0, 43), expand = FALSE) +
     scale_color_viridis_c(direction = -1, option = 'plasma', end = 1) +
     theme_bw() +
+    #st_bbox() +
     ggtitle(paste(title, monthname, sep = ""))+ 
     xlab(expression(paste(Longitude^o,~'N'))) +
     ylab(expression(paste(Latitude^o,~'W')))
 
   #saving file
-  ggsave(filename = monthname, p, device = "png", path = "2_map/out/", height = 7, width = 5)
-  return(out_filename_ext)
+  this_filename <-  file.path('2_map/', 'out/', monthname, '.png', fsep = "")
+  ggsave(filename = this_filename, p, height = 7, width = 5)
+  return(this_filename)
 }
 
 boxplot_func <- function(regression_data, type)
