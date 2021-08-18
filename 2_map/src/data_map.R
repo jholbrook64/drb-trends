@@ -30,7 +30,7 @@ map_sites <- function(data_for_trend_analysis_month, in_network)
   background <- st_as_sf(maps::map("state", plot = FALSE, fill = TRUE))
   DRB_states <- c("new jersey", "pennsylvania", "delaware", "maryland",  "new york")
   background <- background[background$ID=="new jersey" | background$ID=="pennsylvania" | background$ID=="delaware" | background$ID=="maryland" | background$ID=="new york",]  # this should turn background data into a subset
-  do.call(rbind.data.frame, background)
+  #do.call(rbind.data.frame, background)
   # aoi <- st_bbox(c(xmin = min(network[2]$vertices$geometry[[1]]), xmax = max(network[2]$vertices$geometry[[1]]),
   #                  ymax = max(network[2]$vertices$geometry[[2]]), ymin = min(network[2]$vertices$geometry[[2]])), 
   #                crs = st_crs(4326))
