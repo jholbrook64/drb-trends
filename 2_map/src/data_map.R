@@ -22,6 +22,8 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
   net_d <- left_join(net, select(data_for_trend_analysis_month, seg_id_nat = seg_id_nat, Slope)) #%>%
   net_p <- left_join(points, select(data_for_trend_analysis_month, seg_id_nat = seg_id_nat, Slope))
   net_p <- st_as_sf(net_p)
+  points_p <- st_as_sf(points, coords = c("longitude", "latitude"), 
+           crs = 4326)
   #net_p <- left_join(points, select(points, seg_id_nat = seg_id_nat, geometry, ID, longitude, latitude))
   # reassign variable name for a better legend
   names(net_d)[names(net_d) == 'Slope'] <- 'Warming Trend degC Year'
@@ -30,8 +32,6 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
   month_list <- c("January", "February", "March", "April", "May", "June", "July", "August",
                      "September", "October", "November", "December")
   monthname <- month_list[month]
-  
-  browser()
   
   title <- "DRB wide warming trend for the month of "
   background <- st_as_sf(maps::map("state", plot = FALSE, fill = TRUE))
@@ -44,7 +44,7 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
     geom_sf(color = 'grey') +
     geom_sf(data = filter(net_d, !is.na(`Warming Trend degC Year`)), aes(color =`Warming Trend degC Year`)) +
     #geom_sf(data = net_p) + #filter(net_p, !is.na(`Warming Trend degC Year`)), aes(color =`Warming Trend degC Year`)) +   #$seg_id_nat == data_for_trend_analysis_month$seg_id_nat), aes(color = fish_dist_to_outlet_m)) + 
-    geom_sf(data = points) +
+    geom_sf(data = points_p) +
     scale_color_viridis_c(direction = -1, option = 'plasma', end = 1) +
     theme_bw() +
     ggtitle(paste(title, monthname, sep = ""))+ 
@@ -57,8 +57,36 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
   return(this_filename)
 }
 
+map_tiles <-function(data_for_trend_analysis_month, in_network)   # takes in the sample spatial data as other function
+{
+  
+  browser()
+  
+  # simply trying to get an interactive tile map of the same static map
+  net <- readRDS(in_network)[[1]]
+  # use for plotting number of observations
+  month <- unique((data_for_trend_analysis_month$Month))
+  month_list <- c("January", "February", "March", "April", "May", "June", "July", "August",
+                  "September", "October", "November", "December")
+  monthname <- month_list[month]
+  
+  net_d <- left_join(net, select(data_for_trend_analysis_month, seg_id_nat = seg_id_nat, Slope))
+  net_d <- net_d[!rowSums(is.na(net_d["Slope"])), ] 
+  #pal = mapviewpalette("")
+  map_view <- mapview(net_d, zcol =  "",
+                      col.regions = c("yellow", "orange", "pink", "red", "purple"))
+  
+  map_shot <- mapshot(map_view, url = paste0(getwd(), '2_map/out/satMap.html')
+                      #,file = paste0(getwd(), "/map.png")
+  )
+  return('2_map/out/satMap.html')  # hooray! this works!
+}
+
 boxplot_func <- function(regression_data, type)
 {
+  
+  browser()
+  
   if (type == 3) 
   {
     
@@ -72,9 +100,10 @@ boxplot_func <- function(regression_data, type)
     binned_slope <- cut(regression_data$Slope, 12, inlcude.lowest = TRUE, labels=c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"))
     binned_slope <- table(binned_slope)
     regression_data$Month <- factor(regression_data$Month, levels = month.name)#factor(month_list[regression_data$Month])
-    boxp <- ggplot(regression_data, aes(x = Month, y = Slope, show.legend = TRUE))+
+    boxp <- ggplot(regression_data, aes(x = Month, y = Slope))+
       #geom_boxplot(fill = as.numeric(range(cut(regression_data$Month, breaks = -6:6, label = FALSE)))) + 
-      geom_boxplot(fill = binned_slope, show.legend = TRUE) +
+      #geom_violin(fill = binned_slope, show.legend = TRUE) +
+      geom_violin() +
       # aes(fill = after_scale()),size =1)+
       # theme(legend.position="none") +
       theme(axis.text.x = element_text(angle = 90)) +
@@ -104,13 +133,15 @@ boxplot_func <- function(regression_data, type)
     # all the code above this line is ok 8-19, binned_slope should be a vector
     binned_slope <- cut(regression_data$Slope, 12, inlcude.lowest = TRUE, labels=c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"))
     binned_slope <- table(binned_slope)
-    regression_data$Month <- factor(regression_data$Month, levels = month.name)#factor(month_list[regression_data$Month])
-    boxp <- ggplot(regression_data, aes(x = Month, y = Slope, show.legend = TRUE))+
+    #regression_data$Month <- factor(regression_data$Month, levels = month.name)#factor(month_list[regression_data$Month])
+    boxp <- ggplot(regression_data, aes(x = Month, y = Slope, group = Month, show.legend = TRUE))+
       #geom_boxplot(fill = as.numeric(range(cut(regression_data$Month, breaks = -6:6, label = FALSE)))) + 
-      geom_boxplot(fill = binned_slope, show.legend = TRUE) +
-      # aes(fill = after_scale()),size =1)+
-      # theme(legend.position="none") +
-      theme(axis.text.x = element_text(angle = 90)) +
+      #geom_violin(fill = binned_slope, show.legend = TRUE) +
+      geom_violin() +
+      geom_jitter(shape=16, position=position_jitter(0.2)) +
+    # aes(fill = after_scale()),size =1)+
+    # theme(legend.position="none") +
+    theme(axis.text.x = element_text(angle = 90)) +
       scale_fill_distiller(palette = "RdYlGn") + 
       # legend("right", inset = 0.2, title="distributions", c("least distributed", "lesser distributed", "mean distribution", "more distributed", "most distributed"),
       #        #col = c("orange", "black", "red", "green", "blue")) + 
@@ -118,7 +149,7 @@ boxplot_func <- function(regression_data, type)
       ggtitle("Distribution of Stream Segment Trends for Each Month")+ 
       xlab("Individual Segments") +
       ylab("site Trends") 
-      
+    
     this_filename <- file.path('2_map', 'out', 'boxplots_monthly_mean.png')
     ggsave(filename = this_filename, boxp, height = 7, width = 5)
     return(this_filename)
@@ -135,7 +166,7 @@ boxplot_func <- function(regression_data, type)
     regression_data$Month <- factor(regression_data$Month, levels = month.name)#factor(month_list[regression_data$Month])
     boxp <- ggplot(regression_data, aes(x = Month, y = Slope, show.legend = TRUE))+
       #geom_boxplot(fill = as.numeric(range(cut(regression_data$Month, breaks = -6:6, label = FALSE)))) + 
-      geom_boxplot(fill = binned_slope, show.legend = TRUE) +
+      geom_violin(fill = binned_slope, show.legend = TRUE) +
       # aes(fill = after_scale()),size =1)+
       # theme(legend.position="none") +
       theme(axis.text.x = element_text(angle = 90)) +

@@ -13,12 +13,18 @@
 
 flexible_linear_regression <- function(sites, type)
 {
+  
+  browser()
+  
   #where sites is each branched target, and type is the type of linear regression that is be run 
   if (type == 1)
   {
+  browser()  
+    
     lr <- lm(month_mean ~ year, data = sites)
     sum_lr <- summary(lr)
     rs <- sum_lr$r.squared
+    p_vlaue <- sum_lr$coefficients[,4][2]
     max_temp <-  max(sites$month_mean, na.rm = TRUE)
     mean_temp <- mean(sites$month_mean, na.rm = TRUE)
     min_temp <-  min(sites$month_mean, na.rm = TRUE)
@@ -29,6 +35,7 @@ flexible_linear_regression <- function(sites, type)
     lr <- lm(month_meanOfMax ~ year, data = sites)
     sum_lr <- summary(lr)
     rs <- sum_lr$r.squared
+    p_vlaue <- sum_lr$coefficients[,4][2]
     max_temp <-  max(sites$month_meanOfMax, na.rm = TRUE)
     mean_temp <- mean(sites$month_meanOfMax, na.rm = TRUE)
     min_temp <-  min(sites$month_meanOfMax, na.rm = TRUE)
@@ -38,6 +45,7 @@ flexible_linear_regression <- function(sites, type)
     lr <- lm(month_meanOfMin ~ year, data = sites)
     sum_lr <- summary(lr)
     rs <- sum_lr$r.squared 
+    p_vlaue <- sum_lr$coefficients[,4][2]
     max_temp <-  max(sites$month_meanOfMin, na.rm = TRUE)
     mean_temp <- mean(sites$month_meanOfMin, na.rm = TRUE)
     min_temp <-  min(sites$month_meanOfMin, na.rm = TRUE)
@@ -56,16 +64,15 @@ flexible_linear_regression <- function(sites, type)
                                      "Date Range" = lubridate::as.interval(start = sites$date[[1]], sites$date[[nrow(sites)]]),
                                      "years" = sites$n_year[[1]],
                                      "Slope" = 0,
-                                     "r" = 0,
+                                     "p_value" = 0,
                                      "r2" = 0
       ))
     }
     else{
     lr <- lm(annual_mean ~ year, data = sites)
     sum_lr <- summary(lr)
-    
-    #r_cor <- cor(sites$year, sites$annual_mean, use="everything") 
     rs <- sum_lr$r.squared
+    p_vlaue <- sum_lr$coefficients[,4][2]
     max_temp <-  max(sites$annual_mean, na.rm = TRUE)
     mean_temp <- mean(sites$annual_mean, na.rm = TRUE)
     min_temp <-  min(sites$annual_mean, na.rm = TRUE)
@@ -83,7 +90,9 @@ flexible_linear_regression <- function(sites, type)
                         "years" = sites$n_year[[1]],
                         "Slope" = stats[2],
                         #"r" = rs^(1/2),
+                        "p_value" = p_vlaue,
                         "r2" = rs
+                        
                         )
   return(dfstats)
 }
