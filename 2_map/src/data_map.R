@@ -84,35 +84,33 @@ map_tiles <-function(data_for_trend_analysis_month, in_network)   # takes in the
 
 boxplot_func <- function(regression_data, type)
 {
-  
   browser()
   
   if (type == 3) 
   {
-    
-    browser()
-    
     regression_data$Month <- as.factor(regression_data$Month)
+    
     month_list <- c("January", "February", "March", "April", "May", "June", "July", "August",
                     "September", "October", "November", "December")
     regression_data$Month <- month_list[regression_data$Month]
     # all the code above this line is ok 8-19, binned_slope should be a vector
-    binned_slope <- cut(regression_data$Slope, 12, inlcude.lowest = TRUE, labels=c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"))
-    binned_slope <- table(binned_slope)
+    labs <- levels(cut(regression_data$Slope, 12))
+    binned_slope <- cut(regression_data$Slope, 12, inlcude.lowest = TRUE, labels = labs)# c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"))
+    # binned_slope <- table(binned_slope)
+    
     regression_data$Month <- factor(regression_data$Month, levels = month.name)#factor(month_list[regression_data$Month])
-    boxp <- ggplot(regression_data, aes(x = Month, y = Slope))+
-      #geom_boxplot(fill = as.numeric(range(cut(regression_data$Month, breaks = -6:6, label = FALSE)))) + 
-      #geom_violin(fill = binned_slope, show.legend = TRUE) +
+    boxp <- ggplot(regression_data, aes(x = Month, y = Slope, group = Month, show.legend = TRUE))+
+      geom_hline(yintercept=0, linetype="dashed", color = "black") +
       geom_violin() +
-      # aes(fill = after_scale()),size =1)+
-      # theme(legend.position="none") +
+      stat_summary(fun = median, fun.min = median, fun.max = median,
+                   geom = "crossbar",
+                   width = 0.25, color = 'red') +
+      #geom_jitter(shape=16, position=position_jitter(0.2), alpha = 0.4) +
+      geom_jitter(aes(shape=p_value), position=position_jitter(0.2), alpha = 0.4) +
       theme(axis.text.x = element_text(angle = 90)) +
       scale_fill_distiller(palette = "RdYlGn") + 
-      # legend("right", inset = 0.2, title="distributions", c("least distributed", "lesser distributed", "mean distribution", "more distributed", "most distributed"),
-      #        #col = c("orange", "black", "red", "green", "blue")) + 
-      #        fill = topo.colors(5), horiz=TRUE, cex = 0.8) +
       ggtitle("Distribution of Stream Segment Trends for Each Month")+ 
-      xlab("Individual Segments") +
+      xlab("Months") +
       ylab("site Trends") 
     
     
@@ -122,32 +120,31 @@ boxplot_func <- function(regression_data, type)
   }
   if (type == 2) 
   {
+    browser()
+    
     regression_data$Month <- as.factor(regression_data$Month)
-    #regression_data$Slope <- as.factor(regression_data$Slope)
-    # group_colors <- ifelse(levels(regression_data$Slope)>0.0, rgb(0.1,0.1,0.7,0.5),
-    #                 ifelse(levels(regression_data$Slope)<0.0, rgb(0.8,0.1,0.3,0.6),
-    #                             "grey90"  ))
+
     month_list <- c("January", "February", "March", "April", "May", "June", "July", "August",
                     "September", "October", "November", "December")
     regression_data$Month <- month_list[regression_data$Month]
     # all the code above this line is ok 8-19, binned_slope should be a vector
-    binned_slope <- cut(regression_data$Slope, 12, inlcude.lowest = TRUE, labels=c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"))
-    binned_slope <- table(binned_slope)
-    #regression_data$Month <- factor(regression_data$Month, levels = month.name)#factor(month_list[regression_data$Month])
+    labs <- levels(cut(regression_data$Slope, 12))
+    binned_slope <- cut(regression_data$Slope, 12, inlcude.lowest = TRUE, labels = labs)# c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"))
+   # binned_slope <- table(binned_slope)
+  
+    regression_data$Month <- factor(regression_data$Month, levels = month.name)#factor(month_list[regression_data$Month])
     boxp <- ggplot(regression_data, aes(x = Month, y = Slope, group = Month, show.legend = TRUE))+
-      #geom_boxplot(fill = as.numeric(range(cut(regression_data$Month, breaks = -6:6, label = FALSE)))) + 
-      #geom_violin(fill = binned_slope, show.legend = TRUE) +
+      geom_hline(yintercept=0, linetype="dashed", color = "black") +
       geom_violin() +
-      geom_jitter(shape=16, position=position_jitter(0.2)) +
-    # aes(fill = after_scale()),size =1)+
-    # theme(legend.position="none") +
-    theme(axis.text.x = element_text(angle = 90)) +
+      stat_summary(fun = median, fun.min = median, fun.max = median,
+                   geom = "crossbar",
+                   width = 0.25, color = 'red') +
+      #geom_jitter(shape=16, position=position_jitter(0.2), alpha = 0.4) +
+      geom_jitter(aes(shape=p_value), position=position_jitter(0.2), alpha = 0.4) +
+      theme(axis.text.x = element_text(angle = 90)) +
       scale_fill_distiller(palette = "RdYlGn") + 
-      # legend("right", inset = 0.2, title="distributions", c("least distributed", "lesser distributed", "mean distribution", "more distributed", "most distributed"),
-      #        #col = c("orange", "black", "red", "green", "blue")) + 
-      #        fill = topo.colors(5), horiz=TRUE, cex = 0.8) +
       ggtitle("Distribution of Stream Segment Trends for Each Month")+ 
-      xlab("Individual Segments") +
+      xlab("Months") +
       ylab("site Trends") 
     
     this_filename <- file.path('2_map', 'out', 'boxplots_monthly_mean.png')
@@ -156,26 +153,31 @@ boxplot_func <- function(regression_data, type)
   }
   else if (type == 1)
   {
+    browser()
+    
     regression_data$Month <- as.factor(regression_data$Month)
+    
     month_list <- c("January", "February", "March", "April", "May", "June", "July", "August",
                     "September", "October", "November", "December")
     regression_data$Month <- month_list[regression_data$Month]
     # all the code above this line is ok 8-19, binned_slope should be a vector
-    binned_slope <- cut(regression_data$Slope, 12, inlcude.lowest = TRUE, labels=c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"))
-    binned_slope <- table(binned_slope)
+    labs <- levels(cut(regression_data$Slope, 12))
+    binned_slope <- cut(regression_data$Slope, 12, inlcude.lowest = TRUE, labels = labs)# c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"))
+    # binned_slope <- table(binned_slope)
+    
     regression_data$Month <- factor(regression_data$Month, levels = month.name)#factor(month_list[regression_data$Month])
-    boxp <- ggplot(regression_data, aes(x = Month, y = Slope, show.legend = TRUE))+
-      #geom_boxplot(fill = as.numeric(range(cut(regression_data$Month, breaks = -6:6, label = FALSE)))) + 
-      geom_violin(fill = binned_slope, show.legend = TRUE) +
-      # aes(fill = after_scale()),size =1)+
-      # theme(legend.position="none") +
+    boxp <- ggplot(regression_data, aes(x = Month, y = Slope, group = Month, show.legend = TRUE))+
+      geom_hline(yintercept=0, linetype="dashed", color = "black") +
+      geom_violin() +
+      stat_summary(fun = median, fun.min = median, fun.max = median,
+                   geom = "crossbar",
+                   width = 0.25, color = 'red') +
+      #geom_jitter(shape=16, position=position_jitter(0.2), alpha = 0.4) +
+      geom_jitter(aes(shape=p_value), position=position_jitter(0.2), alpha = 0.4) +
       theme(axis.text.x = element_text(angle = 90)) +
       scale_fill_distiller(palette = "RdYlGn") + 
-      # legend("right", inset = 0.2, title="distributions", c("least distributed", "lesser distributed", "mean distribution", "more distributed", "most distributed"),
-      #        #col = c("orange", "black", "red", "green", "blue")) + 
-      #        fill = topo.colors(5), horiz=TRUE, cex = 0.8) +
       ggtitle("Distribution of Stream Segment Trends for Each Month")+ 
-      xlab("Individual Segments") +
+      xlab("Months") +
       ylab("site Trends") 
     
     this_filename <- file.path('2_map', 'out', 'boxplots_monthly_max.png')
