@@ -2,7 +2,7 @@
 ##
 ## Script name: data_map.R
 ##
-## Purpose of script: mapping reaches $ their annual observations
+## Purpose of script: mapping reaches and their annual observations
 ##
 ## Author: Jack Holbrook (USGS)
 ##
@@ -145,10 +145,18 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
   
   points <- as.data.frame(readRDS(in_crosswalk))
   net <- readRDS(in_network)[[1]]
-  # joins attribute w/ spatial data
-  net_d <- left_join(net, select(data_for_trend_analysis_month, site_id = site_id, Slope)) 
-  net_p <- left_join(points, select(data_for_trend_analysis_month, site_id = site_id, Slope))
-  net_p <- st_as_sf(net_p)
+  #net_df <- as.data.frame(readRDS(in_network))
+  
+  # joins attribute w/ spatial data from attribute to points
+  net_d <- net %>% left_join(points, by = 'seg_id_nat')  # this works!
+  # example is below:
+  #regression_data <- regression_data %>% left_join(site_info, by = 'site.id')
+  
+  # joins attribute w/ spatial data from attribute & points to netowrk lines
+  net_d <- left_join(net_d, select(data_for_trend_analysis_month, seg_id_nat = site.id, Slope)) 
+  # net_p <- left_join(points, select(data_for_trend_analysis_month, site_id = site_id, Slope))
+  # net_p <- st_as_sf(net_p)
+  
   points_p <- st_as_sf(points, coords = c("longitude", "latitude"), 
                        crs = 4326)
   #net_p <- left_join(points, select(points, seg_id_nat = seg_id_nat, geometry, ID, longitude, latitude))
@@ -163,6 +171,7 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
   title <- "DRB wide warming trend for the month of "
   background <- st_as_sf(maps::map("state", plot = FALSE, fill = TRUE))
   #DRB_states <- c("new jersey", "pennsylvania", "delaware", "maryland",  "new york")
+  
   # this should turn background data into a subset
   background <- background[background$ID=="new jersey" | background$ID=="pennsylvania" |
                              background$ID=="delaware" | background$ID=="maryland" | background$ID=="new york",]  
