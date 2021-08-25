@@ -19,7 +19,7 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
   points <- as.data.frame(readRDS(in_crosswalk))
   net <- readRDS(in_network)[[1]]
   # joins attribute w/ spatial data
-  net_d <- left_join(net, select(data_for_trend_analysis_month, seg_id_nat = seg_id_nat, Slope)) #%>%
+  net_d <- left_join(net, select(data_for_trend_analysis_month, seg_id_nat = seg_id_nat, Slope)) 
   net_p <- left_join(points, select(data_for_trend_analysis_month, seg_id_nat = seg_id_nat, Slope))
   net_p <- st_as_sf(net_p)
   points_p <- st_as_sf(points, coords = c("longitude", "latitude"), 
@@ -82,31 +82,38 @@ map_tiles <-function(data_for_trend_analysis_month, in_network)   # takes in the
   return('2_map/out/satMap.html')  # hooray! this works!
 }
 
-boxplot_func <- function(regression_data, type)
+boxplot_func <- function(regression_data, type, site_info)
 {
   browser()
-  
+  # this is new, used to jion data
+  site_info <- read_csv(site_info)
+  #regression_data <- left_join(regression_data, select(site_info, site_id = site_id, reservoir_code))
+  regression_data <- regression_data %>% left_join(site_info, by = 'site.id')
+  #regression_data <- regression_data %>% full_join(regression_data, by = 'site.id')
   if (type == 3) 
   {
     regression_data$Month <- as.factor(regression_data$Month)
-    
-    month_list <- c("January", "February", "March", "April", "May", "June", "July", "August",
+    regression_data$Slope <- as.numeric(regression_data$Slope)
+        month_list <- c("January", "February", "March", "April", "May", "June", "July", "August",
                     "September", "October", "November", "December")
-    regression_data$Month <- month_list[regression_data$Month]
+    #regression_data$Month <- month_list[regression_data$Month]
     # all the code above this line is ok 8-19, binned_slope should be a vector
     labs <- levels(cut(regression_data$Slope, 12))
     binned_slope <- cut(regression_data$Slope, 12, inlcude.lowest = TRUE, labels = labs)# c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"))
     # binned_slope <- table(binned_slope)
     
+    names(regression_data)[names(regression_data) == 'reservoir_code'] <- 'Reservoir Code'
+    names(regression_data)[names(regression_data) == 'is_significant'] <- 'Significant above a P of 0.01'
     regression_data$Month <- factor(regression_data$Month, levels = month.name)#factor(month_list[regression_data$Month])
     boxp <- ggplot(regression_data, aes(x = Month, y = Slope, group = Month, show.legend = TRUE))+
-      geom_hline(yintercept=0, linetype="dashed", color = "black") +
+      geom_hline(yintercept= 0, linetype="dashed", color = "black") +
       geom_violin() +
       stat_summary(fun = median, fun.min = median, fun.max = median,
                    geom = "crossbar",
                    width = 0.25, color = 'red') +
       #geom_jitter(shape=16, position=position_jitter(0.2), alpha = 0.4) +
-      geom_jitter(aes(shape=p_value), position=position_jitter(0.2), alpha = 0.4) +
+      geom_jitter(aes(shape=`Significant above a P of 0.01`), position=position_jitter(0.2), alpha = 0.4) +
+      scale_shape_manual(values = c(1,16))+
       theme(axis.text.x = element_text(angle = 90)) +
       scale_fill_distiller(palette = "RdYlGn") + 
       ggtitle("Distribution of Stream Segment Trends for Each Month")+ 
@@ -121,34 +128,40 @@ boxplot_func <- function(regression_data, type)
   if (type == 2) 
   {
     browser()
-    
     regression_data$Month <- as.factor(regression_data$Month)
-
+    regression_data$Slope <- as.numeric(regression_data$Slope)
+    regression_data$reservoir_code <- as.factor(regression_data$reservoir_code)
     month_list <- c("January", "February", "March", "April", "May", "June", "July", "August",
                     "September", "October", "November", "December")
     regression_data$Month <- month_list[regression_data$Month]
-    # all the code above this line is ok 8-19, binned_slope should be a vector
+
     labs <- levels(cut(regression_data$Slope, 12))
-    binned_slope <- cut(regression_data$Slope, 12, inlcude.lowest = TRUE, labels = labs)# c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"))
-   # binned_slope <- table(binned_slope)
+    binned_slope <- cut(regression_data$Slope, 12, inlcude.lowest = TRUE, labels = labs)
   
-    regression_data$Month <- factor(regression_data$Month, levels = month.name)#factor(month_list[regression_data$Month])
-    boxp <- ggplot(regression_data, aes(x = Month, y = Slope, group = Month, show.legend = TRUE))+
+    names(regression_data)[names(regression_data) == 'reservoir_code'] <- 'Reservoir Code'
+    names(regression_data)[names(regression_data) == 'is_significant'] <- 'Significant above a P of 0.01'
+    
+    regression_data$Month <- factor(regression_data$Month, levels = month.name)
+    regression_data <- filter(regression_data, !is.na(`Reservoir Code`))
+    boxp <- ggplot(regression_data, aes(x = Month, y = Slope, group = Month, color = `Reservoir Code`, show.legend = TRUE))+
       geom_hline(yintercept=0, linetype="dashed", color = "black") +
       geom_violin() +
       stat_summary(fun = median, fun.min = median, fun.max = median,
                    geom = "crossbar",
                    width = 0.25, color = 'red') +
       #geom_jitter(shape=16, position=position_jitter(0.2), alpha = 0.4) +
-      geom_jitter(aes(shape=p_value), position=position_jitter(0.2), alpha = 0.4) +
-      theme(axis.text.x = element_text(angle = 90)) +
-      scale_fill_distiller(palette = "RdYlGn") + 
-      ggtitle("Distribution of Stream Segment Trends for Each Month")+ 
+      geom_jitter(aes(shape=`Significant above a P of 0.01`), position=position_jitter(0.2), alpha = 0.4) +
+      scale_shape_manual(values = c(1,16)) +
+     # theme_bw(axis.text.x = element_text(angle = 90)) +
+      theme_bw() +
+      #theme() +
+      scale_color_brewer(palette="Dark2") +
+      ggtitle("Distribution of Stream Segment Trends for Each Month") + 
       xlab("Months") +
       ylab("site Trends") 
     
     this_filename <- file.path('2_map', 'out', 'boxplots_monthly_mean.png')
-    ggsave(filename = this_filename, boxp, height = 7, width = 5)
+    ggsave(filename = this_filename, boxp, height = 7, width = 12)
     return(this_filename)
   }
   else if (type == 1)
@@ -156,7 +169,7 @@ boxplot_func <- function(regression_data, type)
     browser()
     
     regression_data$Month <- as.factor(regression_data$Month)
-    
+    regression_data$Slope <- as.numeric(regression_data$Slope)
     month_list <- c("January", "February", "March", "April", "May", "June", "July", "August",
                     "September", "October", "November", "December")
     regression_data$Month <- month_list[regression_data$Month]
@@ -170,10 +183,10 @@ boxplot_func <- function(regression_data, type)
       geom_hline(yintercept=0, linetype="dashed", color = "black") +
       geom_violin() +
       stat_summary(fun = median, fun.min = median, fun.max = median,
-                   geom = "crossbar",
-                   width = 0.25, color = 'red') +
-      #geom_jitter(shape=16, position=position_jitter(0.2), alpha = 0.4) +
-      geom_jitter(aes(shape=p_value), position=position_jitter(0.2), alpha = 0.4) +
+                    geom = "crossbar",
+                    width = 0.25, color = 'red') +
+      #geom_jitter(shape=16, position=position_jitter(0.2), alpha = 0.4) 
+      geom_jitter(aes(shape=is_significant), position=position_jitter(0.2), alpha = 0.4) +
       theme(axis.text.x = element_text(angle = 90)) +
       scale_fill_distiller(palette = "RdYlGn") + 
       ggtitle("Distribution of Stream Segment Trends for Each Month")+ 
@@ -181,7 +194,7 @@ boxplot_func <- function(regression_data, type)
       ylab("site Trends") 
     
     this_filename <- file.path('2_map', 'out', 'boxplots_monthly_max.png')
-    ggsave(filename = this_filename, boxp, height = 7, width = 5)
+    ggsave(filename = this_filename, boxp, height = 7, width = 12)
     return(this_filename)
   }
 }

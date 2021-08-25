@@ -19,8 +19,6 @@ flexible_linear_regression <- function(sites, type)
   #where sites is each branched target, and type is the type of linear regression that is be run 
   if (type == 1)
   {
-  browser()  
-    
     lr <- lm(month_mean ~ year, data = sites)
     sum_lr <- summary(lr)
     rs <- sum_lr$r.squared
@@ -56,7 +54,7 @@ flexible_linear_regression <- function(sites, type)
     # here there is a problem of one of the targets having all NA values
     if(all(is.nan(sites$annual_mean)))
     {
-      return(  dfstats <- data.frame("seg_id_nat" = sites$seg_id_nat[[1]], 
+      return(  dfstats <- data.frame("site id" = sites$site_id[[1]], # was seg_id_nat
                                      "Month" = sites$month[[1]],
                                      "max_temp_observed" = 0,
                                      "mean_monthly_temp" = 0,
@@ -65,6 +63,7 @@ flexible_linear_regression <- function(sites, type)
                                      "years" = sites$n_year[[1]],
                                      "Slope" = 0,
                                      "p_value" = 0,
+                                     "is_significant" = 0,
                                      "r2" = 0
       ))
     }
@@ -81,7 +80,7 @@ flexible_linear_regression <- function(sites, type)
   stats <- c(sum_lr$coefficients[[1]],
              sum_lr$coefficients[[2]])
   
-  dfstats <- data.frame("seg_id_nat" = sites$seg_id_nat[[1]], 
+  dfstats <- data.frame("site id" = sites$site_id[[1]], # was seg_id_nat
                         "Month" = sites$month[[1]],
                         "max_temp_observed" = max_temp,
                         "mean_monthly_temp" = mean_temp,
@@ -91,8 +90,8 @@ flexible_linear_regression <- function(sites, type)
                         "Slope" = stats[2],
                         #"r" = rs^(1/2),
                         "p_value" = p_vlaue,
+                        "is_significant" = p_vlaue < 0.01,
                         "r2" = rs
-                        
                         )
   return(dfstats)
 }

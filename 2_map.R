@@ -18,13 +18,13 @@ tar_option_set(packages = c('tidyverse', 'sf', 'mapview'))
 map_targets_list <- list(
   
   tar_target(boxplots_month_max, 
-             boxplot_func(meanofmax_regressions, 1), format = 'file'),
+             boxplot_func(meanofmax_regression, 1, "2_map/in/reservoir_coding.csv"), format = 'file'),
   
   tar_target(boxplots_month_mean, 
-             boxplot_func(meanofmean_regression, 2), format = 'file'),
+             boxplot_func(meanofmean_regression, 2, "2_map/in/reservoir_coding.csv"), format = 'file'),
   
   tar_target(boxplots_month_min, 
-             boxplot_func(meanofmin_regression, 3), format = 'file'),
+             boxplot_func(meanofmin_regression, 3, "2_map/in/reservoir_coding.csv"), format = 'file'),
   
   tar_target(hist_year, 
              hist_func(Annual_regression), format = 'file'), #1

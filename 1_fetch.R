@@ -17,8 +17,12 @@ source("1_fetch/src/data_summary.R")
 tar_option_set(packages = c('tidyverse'))
 
 fetch_targest_list <- list(
+  # tar_target(clean_Monthly,
+  #            clean_monthly('1_fetch/in/obs_temp_drb.rds')),
+  
   tar_target(clean_Monthly,
-             clean_monthly('1_fetch/in/obs_temp_drb.rds')),
+             clean_monthly('1_fetch/in/raw_drb_temp_data.rds')),
+             
   
   tar_target(select_data,
              filter_data(clean_Monthly)),
@@ -34,10 +38,10 @@ fetch_targest_list <- list(
 summarize_targets_list <- list(
   
   tar_group_by(month_data,
-               data_for_trend_analysis, month, seg_id_nat),
+               data_for_trend_analysis, month, site_id), # previoulsy, seg_id_nat
   
   tar_group_by(year_data,
-               year_trend_analysis, seg_id_nat),
+               year_trend_analysis, site_id), # previoulsy, seg_id_nat
   
   meanofmean_regressions <- tar_target(meanofmean_regression,
                                        flexible_linear_regression(month_data, 1), pattern = map(month_data), iteration = "group"),
