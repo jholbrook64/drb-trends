@@ -14,7 +14,7 @@
 flexible_linear_regression <- function(sites, type)
 {
   
-  browser()
+  #browser()
   
   #where sites is each branched target, and type is the type of linear regression that is be run 
   if (type == 1)
@@ -54,7 +54,7 @@ flexible_linear_regression <- function(sites, type)
     # here there is a problem of one of the targets having all NA values
     if(all(is.nan(sites$annual_mean)))
     {
-      return(  dfstats <- data.frame("site id" = sites$site_id[[1]], # was seg_id_nat
+      return(  dfstats <- data.frame("site id" = sites$site_id[[1]], 
                                      "Month" = sites$month[[1]],
                                      "max_temp_observed" = 0,
                                      "mean_monthly_temp" = 0,
@@ -80,7 +80,7 @@ flexible_linear_regression <- function(sites, type)
   stats <- c(sum_lr$coefficients[[1]],
              sum_lr$coefficients[[2]])
   
-  dfstats <- data.frame("site id" = sites$site_id[[1]], # was seg_id_nat
+  dfstats <- data.frame("site id" = sites$site_id[[1]], 
                         "Month" = sites$month[[1]],
                         "max_temp_observed" = max_temp,
                         "mean_monthly_temp" = mean_temp,

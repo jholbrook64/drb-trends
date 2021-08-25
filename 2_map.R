@@ -27,7 +27,7 @@ map_targets_list <- list(
              boxplot_func(meanofmin_regression, 3, "2_map/in/reservoir_coding.csv"), format = 'file'),
   
   tar_target(hist_year, 
-             hist_func(Annual_regression), format = 'file'), #1
+             hist_func(meanofmax_regression), format = 'file'), #1
   
  # 8-17-2021 the reason why this group by is needed is because 
  # patterns can only branch over explicitly declared targets in the pipeline

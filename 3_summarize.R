@@ -28,13 +28,13 @@ meta_summaries <- list(
   
   # descriptive stats - create a summary of mins across annual branches:
   tar_target(descrip_annual, 
-             summary(year_data$annual_mean),  pattern = map(year_data), iteration = "group")#,
+             summary(year_data$annual_mean),  pattern = map(year_data), iteration = "group"),
   
   
   # this simply load the highest trend target, I want to inlcudee this in my analysis
-  # tar_target(look_at_this_segment3, month_data %>% 
-  #              filter(seg_id_nat == 2338) %>% 
-  #              filter(month == 5)),
+  tar_target(look_at_this_segment3, month_data %>%
+               filter(site_id == 'USGS-01434000') %>%
+               filter(month == 1))
   # tar_target(look_at_this_segment4, month_data %>%
   #              filter(seg_id_nat == 1573) %>%
   #              filter(month == 5)),
