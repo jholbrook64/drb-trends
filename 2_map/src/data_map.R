@@ -144,6 +144,9 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
   browser()
   
   points <- as.data.frame(readRDS(in_crosswalk))
+  site_v <- data_for_trend_analysis_month$site.id
+  names(points)[names(points) == 'site_id'] <- 'site.id'
+  select_points <- filter(points, points$site.id %in% site_v)
   net <- readRDS(in_network)[[1]]
   #net_df <- as.data.frame(readRDS(in_network))
   
@@ -153,11 +156,12 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
   #regression_data <- regression_data %>% left_join(site_info, by = 'site.id')
   
   # joins attribute w/ spatial data from attribute & points to netowrk lines
-  net_d <- left_join(net_d, select(data_for_trend_analysis_month, seg_id_nat = site.id, Slope)) 
+  names(net_d)[names(net_d) == 'site_id'] <- 'site.id'
+  net_d <- net_d %>% left_join(data_for_trend_analysis_month, by = 'site.id') 
   # net_p <- left_join(points, select(data_for_trend_analysis_month, site_id = site_id, Slope))
   # net_p <- st_as_sf(net_p)
   
-  points_p <- st_as_sf(points, coords = c("longitude", "latitude"), 
+  points_p <- st_as_sf(select_points, coords = c("longitude", "latitude"), 
                        crs = 4326)
   #net_p <- left_join(points, select(points, seg_id_nat = seg_id_nat, geometry, ID, longitude, latitude))
   # reassign variable name for a better legend
@@ -175,14 +179,25 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
   # this should turn background data into a subset
   background <- background[background$ID=="new jersey" | background$ID=="pennsylvania" |
                              background$ID=="delaware" | background$ID=="maryland" | background$ID=="new york",]  
+  aoi <- st_crop(points_p, xmin = min(points$longitude), xmax = max(points$longitude),
+                            ymin = min(points$latitude), ymax = max(points$latitude),
+                            crs = 4326)
   p <- ggplot(net_d) +
     geom_sf(data = background, fill="white") +
     geom_sf(color = 'grey') +
     geom_sf(data = filter(net_d, !is.na(`Warming Trend degC Year`)), aes(color =`Warming Trend degC Year`)) +
-    #geom_sf(data = net_p) + #filter(net_p, !is.na(`Warming Trend degC Year`)), aes(color =`Warming Trend degC Year`)) +   #$seg_id_nat == data_for_trend_analysis_month$seg_id_nat), aes(color = fish_dist_to_outlet_m)) + 
-    geom_sf(data = points_p) +
-    scale_color_viridis_c(direction = -1, option = 'plasma', end = 1) +
+    #geom_sf(data = net_p) + #filter(net_p, !is.na(`Warming Trend degC Year`)), aes(color =`Warming Trend degC Year`)) +   #$seg_id_nat == data_for_trend_analysis_month$seg_id_nat), aes(color = fish_dist_to_outlet_m)) +
+    #geom_point(data = net_d, aes(x = longitude, y = latitude, size = years))
+
+    
     theme_bw() +
+    geom_sf(data = points_p) +
+    coord_sf(xlim = c(min(points$longitude), xmax = max(points$longitude)),
+             ylim = c(ymin = min(points$latitude), ymax = max(points$latitude)),
+             crs = 4326) +
+    #geom_sf(color = 'blue') +
+    scale_color_viridis_c(direction = -1, option = 'plasma', end = 1) +
+    
     ggtitle(paste(title, monthname, sep = ""))+ 
     xlab(expression(paste(Longitude^o,~'N'))) +
     ylab(expression(paste(Latitude^o,~'W')))

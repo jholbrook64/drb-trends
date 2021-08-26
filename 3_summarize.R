@@ -34,7 +34,9 @@ meta_summaries <- list(
   # this simply load the highest trend target, I want to inlcudee this in my analysis
   tar_target(look_at_this_segment3, month_data %>%
                filter(site_id == 'USGS-01434000') %>%
-               filter(month == 1))
+               filter(month == 7)),
+  
+  tar_target(line_plot2, line_plot2(look_at_this_segment3), format = 'file')
   # tar_target(look_at_this_segment4, month_data %>%
   #              filter(seg_id_nat == 1573) %>%
   #              filter(month == 5)),

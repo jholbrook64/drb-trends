@@ -161,3 +161,20 @@ bind_transposed <- function(df_positive_transpose, df_negative_transpose)
 final_df <- bind_rows(df_positive_transpose, df_negative_transpose)
 return(final_df)
 }
+
+line_plot2 <- function(segment)
+{
+  p <- ggplot(data=segment, aes(x=date, y=max_temp_degC, group=1)) +
+    geom_line()+
+    geom_point()+
+    theme_bw() +
+    #theme() +
+    scale_color_brewer(palette="Dark2") +
+    ggtitle("Temperature trend at Port Jervis, New York") + 
+    xlab("Date") +
+    ylab("Max Daily Temperature") 
+  
+  this_filename <-  file.path('3_summarize/', 'out/', 'line_plot_july', '.png', fsep = "")
+  ggsave(filename = this_filename, p, height = 7, width = 12)
+  return(this_filename)
+}

@@ -37,8 +37,8 @@ map_targets_list <- list(
 
   # this is to create 12 plots that show the difference in the slope, represented as "year" for the regressions over each branch. 
   tar_target(site_map_pngs,
-             map_sites(months, '1_fetch/in/network.rds', '1_fetch/in/crosswalk_site_reach.rds'), format = 'file', pattern = map(months))
+             map_sites(months, '1_fetch/in/network.rds', '1_fetch/in/crosswalk_site_reach.rds'), format = 'file', pattern = map(months)),
 
-  # tar_target(satellite_image_drbTrends,
-  #            map_tiles(meanofmean_regression, '1_fetch/in/network.rds'), format = 'file')
+  tar_target(satellite_image_drbTrends,
+             map_tiles(meanofmean_regression, '1_fetch/in/network.rds'), format = 'file')
   )
