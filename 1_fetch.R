@@ -31,7 +31,10 @@ fetch_targest_list <- list(
              group_time(select_data)),
   
   tar_target(year_trend_analysis,
-             group_year(select_data))
+             group_year(select_data)),
+  
+  tar_target(tiles_month_site,
+             tile_plot_func(data_for_trend_analysis), format = 'file')
   )
   # end data cleaning targets
   
