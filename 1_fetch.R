@@ -45,7 +45,8 @@ summarize_targets_list <- list(
   
   tar_group_by(year_data,
                year_trend_analysis, site_id), # previoulsy, seg_id_nat
-  
+                                      
+                                      # change the data param on line 51 pleases, 9-1-2021
   meanofmean_regressions <- tar_target(meanofmean_regression,
                                        flexible_linear_regression(month_data, 1), pattern = map(month_data), iteration = "group"),
   

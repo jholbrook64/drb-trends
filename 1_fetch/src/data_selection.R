@@ -118,7 +118,7 @@ tile_plot_func <- function(data_for_trend_analysis)
   data_for_trend_analysis <-  
     data_for_trend_analysis %>%
     group_by(month, site_id) %>% 
-    mutate(instance = 1)
+    mutate(instance = 1) %>% 
     ungroup()
   
   count_sites <-  
@@ -145,6 +145,6 @@ tile_plot_func <- function(data_for_trend_analysis)
   #                                   y = "month")))
     
     this_filename <- file.path('1_fetch', 'out', 'tile_plot_monthly_.png')
-    ggsave(filename = this_filename, boxp, height = 7, width = 12)
+    ggsave(filename = this_filename, tile_p, height = 7, width = 12)
     return(this_filename)
 }

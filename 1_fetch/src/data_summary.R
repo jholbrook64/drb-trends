@@ -14,11 +14,16 @@
 flexible_linear_regression <- function(sites, type)
 {
   
-  #browser()
+  browser()
   
   #where sites is each branched target, and type is the type of linear regression that is be run 
   if (type == 1)
   {
+    sites <- sites %>% 
+      drop_na(month_mean)
+                # make this for every ifelse case
+    
+    
     lr <- lm(month_mean ~ year, data = sites)
     sum_lr <- summary(lr)
     rs <- sum_lr$r.squared
@@ -29,7 +34,9 @@ flexible_linear_regression <- function(sites, type)
   }
   else if (type == 2)
   {
-    #2 will be the mean of max's. 
+    sites <- sites %>% 
+      drop_na(month_meanOfMax)
+ 
     lr <- lm(month_meanOfMax ~ year, data = sites)
     sum_lr <- summary(lr)
     rs <- sum_lr$r.squared
@@ -40,6 +47,9 @@ flexible_linear_regression <- function(sites, type)
   }
   else if (type == 3)
   {
+    sites <- sites %>% 
+      drop_na(month_meanOfMin)
+    
     lr <- lm(month_meanOfMin ~ year, data = sites)
     sum_lr <- summary(lr)
     rs <- sum_lr$r.squared 
@@ -60,7 +70,7 @@ flexible_linear_regression <- function(sites, type)
                                      "mean_monthly_temp" = 0,
                                      "min_temp_observed" = 0,
                                      "Date Range" = lubridate::as.interval(start = sites$date[[1]], sites$date[[nrow(sites)]]),
-                                     "years" = sites$n_year[[1]],
+                                     "years" = sites$nyear[[1]],
                                      "Slope" = 0,
                                      "p_value" = 0,
                                      "is_significant" = 0,
@@ -86,7 +96,7 @@ flexible_linear_regression <- function(sites, type)
                         "mean_monthly_temp" = mean_temp,
                         "min_temp_observed" = min_temp,
                         "Date Range" = lubridate::as.interval(start = sites$date[[1]], sites$date[[nrow(sites)]]),
-                        "years" = sites$n_year[[1]],
+                        "years" = sites$nyear[[1]],
                         "Slope" = stats[2],
                         #"r" = rs^(1/2),
                         "p_value" = p_vlaue,
