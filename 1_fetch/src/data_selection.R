@@ -1,6 +1,6 @@
 ## ---------------------------
 ##
-## Script name: data_map.R
+## Script name: data_selection.R
 ##
 ## Purpose of script: selecting and filtering data from original data-set.
 ##
@@ -13,6 +13,7 @@
 
 clean_monthly <- function(in_file)
 {
+  browser()
   # keep this one unchanged since daily values need to retained for the summaries
   
   # all seg_id_nat were changed to site_id
@@ -32,8 +33,11 @@ clean_monthly <- function(in_file)
   dat <- dat %>%
     mutate(days_in_month = lubridate::days_in_month(date)) %>% 
     mutate(month = lubridate::month(date)) %>% 
-    mutate(meets_criteria = n_per_month >= (days_in_month-2)) %>%
-    filter(meets_criteria) %>% 
+    mutate(month_criteria = n_per_month >= (days_in_month-2)) %>%
+    filter(month_criteria) %>% 
+    # the goal here is to set a constraint for the number of months in a year. 
+    mutate(months_in_year = 12) %>% # thi one should count the months for each calendar year
+    mutate(year_criteria = months_in_year > 7)
     group_by(site_id, month) %>% 
     mutate(n_year = n_distinct(month_year)) %>% 
     #mutate(n_year = floor(n_distinct(month_year)/12)) %>% # remove floor() if it gives problems
@@ -66,7 +70,7 @@ group_time <- function(select_data)
     summarize(month_mean = mean(mean_temp_degC, na.rm = TRUE),
               month_meanOfMax = mean(max_temp_degC , na.rm = TRUE),
               month_meanOfMin = mean(min_temp_degC, na.rm = TRUE),
-              nyear = mean(n_year),
+              nyear = median(n_year),
               date = median(date)
               )
     # summarize(month_meanOfMax = mean(max_temp_degC , na.rm = TRUE)) %>%
@@ -100,6 +104,13 @@ group_year <- function(select_data)
     drop_na(annual_mean, annual_meanOfMax, annual_meanOfMin)
   
   return(year_trend_analysis)
+}
+
+clean_monthly_mean <- function(all_data)
+{
+  noNA_data <- all_data %>% 
+    drop_na(month_mean)
+  return(noNA_data)
 }
 
 tile_plot_func <- function(data_for_trend_analysis)

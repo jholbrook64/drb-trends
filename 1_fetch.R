@@ -30,6 +30,10 @@ fetch_targest_list <- list(
   tar_target(data_for_trend_analysis,                            
              group_time(select_data)),
   
+  tar_target(NA_removed_data_for_trend_analysis,
+             clean_monthly_mean(data_for_trend_analysis)),
+  
+  
   tar_target(year_trend_analysis,
              group_year(select_data)),
   

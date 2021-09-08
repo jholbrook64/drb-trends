@@ -202,7 +202,7 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
     xlab(expression(paste(Longitude^o,~'N'))) +
     ylab(expression(paste(Latitude^o,~'W')))
   
-  #saving file
+  # saving file
   this_filename <-  file.path('2_map/', 'out/', monthname, '.png', fsep = "")
   ggsave(filename = this_filename, p, height = 7, width = 5)
   return(this_filename)
