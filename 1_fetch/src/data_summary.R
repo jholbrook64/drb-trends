@@ -14,7 +14,7 @@
 flexible_linear_regression <- function(sites, type)
 {
   
-  browser()
+  #browser()
   
   #where sites is each branched target, and type is the type of linear regression that is be run 
   if (type == 1)

@@ -13,7 +13,7 @@
 
 clean_monthly <- function(in_file)
 {
-  browser()
+  #browser()
   # keep this one unchanged since daily values need to retained for the summaries
   
   # all seg_id_nat were changed to site_id
@@ -37,7 +37,7 @@ clean_monthly <- function(in_file)
     filter(month_criteria) %>% 
     # the goal here is to set a constraint for the number of months in a year. 
     mutate(months_in_year = 12) %>% # thi one should count the months for each calendar year
-    mutate(year_criteria = months_in_year > 7)
+    mutate(year_criteria = months_in_year > 7) %>% 
     group_by(site_id, month) %>% 
     mutate(n_year = n_distinct(month_year)) %>% 
     #mutate(n_year = floor(n_distinct(month_year)/12)) %>% # remove floor() if it gives problems
