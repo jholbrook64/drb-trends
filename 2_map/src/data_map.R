@@ -210,9 +210,7 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
 
 map_tiles <-function(data_for_trend_analysis_month, in_network)   # takes in the sample spatial data as other function
 {
-  
   browser()
-  
   # simply trying to get an interactive tile map of the same static map
   net <- readRDS(in_network)[[1]]
   # use for plotting number of observations
@@ -221,12 +219,11 @@ map_tiles <-function(data_for_trend_analysis_month, in_network)   # takes in the
                   "September", "October", "November", "December")
   monthname <- month_list[month]
   
-  net_d <- left_join(net, select(data_for_trend_analysis_month, seg_id_nat = seg_id_nat, Slope))
+  net_d <- left_join(net, select(data_for_trend_analysis_month, site_id = seg_id_nat, Slope))
   net_d <- net_d[!rowSums(is.na(net_d["Slope"])), ] 
   #pal = mapviewpalette("")
   map_view <- mapview(net_d, zcol =  "",
                       col.regions = c("yellow", "orange", "pink", "red", "purple"))
-  
   map_shot <- mapshot(map_view, url = paste0(getwd(), '2_map/out/satMap.html')
                       #,file = paste0(getwd(), "/map.png")
   )

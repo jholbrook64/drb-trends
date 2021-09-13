@@ -174,7 +174,7 @@ return(final_df)
 
 line_plot2 <- function(segment)
 {
-  p <- ggplot(data=segment, aes(x=date, y=max_temp_degC, group=1)) +
+  p <- ggplot(data=segment, aes(x=date, y=month_meanOfMax, group=1)) +
     geom_line()+
     geom_point()+
     theme_bw() +
