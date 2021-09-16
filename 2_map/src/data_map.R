@@ -142,7 +142,7 @@ boxplot_func <- function(regression_data, type, site_info)
 map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk) 
 {
   browser()
-  
+
   points <- as.data.frame(readRDS(in_crosswalk))
   site_v <- data_for_trend_analysis_month$site.id
   names(points)[names(points) == 'site_id'] <- 'site.id'
@@ -155,7 +155,7 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
   # example is below:
   #regression_data <- regression_data %>% left_join(site_info, by = 'site.id')
   
-  # joins attribute w/ spatial data from attribute & points to netowrk lines
+  # joins attribute w/ spatial data from attribute & points to network lines
   names(net_d)[names(net_d) == 'site_id'] <- 'site.id'
   net_d <- net_d %>% left_join(data_for_trend_analysis_month, by = 'site.id') 
   # net_p <- left_join(points, select(data_for_trend_analysis_month, site_id = site_id, Slope))
@@ -171,11 +171,8 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
   month_list <- c("January", "February", "March", "April", "May", "June", "July", "August",
                   "September", "October", "November", "December")
   monthname <- month_list[month]
-  
   title <- "DRB wide warming trend for the month of "
   background <- st_as_sf(maps::map("state", plot = FALSE, fill = TRUE))
-  #DRB_states <- c("new jersey", "pennsylvania", "delaware", "maryland",  "new york")
-  
   # this should turn background data into a subset
   background <- background[background$ID=="new jersey" | background$ID=="pennsylvania" |
                              background$ID=="delaware" | background$ID=="maryland" | background$ID=="new york",]  
@@ -188,8 +185,6 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
     geom_sf(data = filter(net_d, !is.na(`Warming Trend degC Year`)), aes(color =`Warming Trend degC Year`)) +
     #geom_sf(data = net_p) + #filter(net_p, !is.na(`Warming Trend degC Year`)), aes(color =`Warming Trend degC Year`)) +   #$seg_id_nat == data_for_trend_analysis_month$seg_id_nat), aes(color = fish_dist_to_outlet_m)) +
     #geom_point(data = net_d, aes(x = longitude, y = latitude, size = years))
-
-    
     theme_bw() +
     geom_sf(data = points_p) +
     coord_sf(xlim = c(min(points$longitude), xmax = max(points$longitude)),
@@ -197,7 +192,6 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
              crs = 4326) +
     #geom_sf(color = 'blue') +
     scale_color_viridis_c(direction = -1, option = 'plasma', end = 1) +
-    
     ggtitle(paste(title, monthname, sep = ""))+ 
     xlab(expression(paste(Longitude^o,~'N'))) +
     ylab(expression(paste(Latitude^o,~'W')))
@@ -208,23 +202,48 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
   return(this_filename)
 }
 
-map_tiles <-function(data_for_trend_analysis_month, in_network)   # takes in the sample spatial data as other function
+map_tiles <-function(data_for_trend_analysis_month, in_network, in_crosswalk)   # takes in the sample spatial data as other function
 {
   browser()
   # simply trying to get an interactive tile map of the same static map
+  points <- as.data.frame(readRDS(in_crosswalk))
+  site_v <- data_for_trend_analysis_month$site.id
+  names(points)[names(points) == 'site_id'] <- 'site.id'
+  select_points <- filter(points, points$site.id %in% site_v)
   net <- readRDS(in_network)[[1]]
+  
+  #running unique joins across datas
+  net_d <- net %>% left_join(points, by = 'seg_id_nat')
+  
+  # joins attribute w/ spatial data from attribute & points to netowrk lines
+  names(net_d)[names(net_d) == 'site_id'] <- 'site.id'
+  net_d <- net_d %>% left_join(data_for_trend_analysis_month, by = 'site.id') 
+  
+  # change anme
+  names(net_d)[names(net_d) == 'Slope'] <- 'Warming Trend degC Year'
+  
+  # create points data set as spatial reference 
+  points_p <- st_as_sf(select_points, coords = c("longitude", "latitude"), 
+                       crs = 4326)
+  
   # use for plotting number of observations
   month <- unique((data_for_trend_analysis_month$Month))
   month_list <- c("January", "February", "March", "April", "May", "June", "July", "August",
                   "September", "October", "November", "December")
   monthname <- month_list[month]
   
-  net_d <- left_join(net, select(data_for_trend_analysis_month, site_id = seg_id_nat, Slope))
-  net_d <- net_d[!rowSums(is.na(net_d["Slope"])), ] 
+  #net_d <- left_join(net, select(data_for_trend_analysis_month, site_id = seg_id_nat, Slope))
+  #net_d <- net_d[!rowSums(is.na(net_d[`Warming Trend degC Year`])), ] 
   #pal = mapviewpalette("")
-  map_view <- mapview(net_d, zcol =  "",
-                      col.regions = c("yellow", "orange", "pink", "red", "purple"))
-  map_shot <- mapshot(map_view, url = paste0(getwd(), '2_map/out/satMap.html')
+  mapviewGetOption("basemaps")
+  mapviewOptions(basemaps = c("Esri.WorldImagery", "OpenStreetMap"),
+                 raster.palette = grey.colors,
+                 vector.palette = colorRampPalette(c("snow", "cornflowerblue", "grey10")),
+                 na.color = "grey",
+                 layers.control.pos = "topright")
+  map_view <- mapview(net_d, zcol =  'Warming Trend degC Year') + mapview(points_p, zcol = 'ID')
+                      col.regions = c("yellow", "orange", "pink", "red", "purple")
+  map_shot <- mapshot(map_view, url = paste0(getwd(), '/2_map/out/satMap.html')
                       #,file = paste0(getwd(), "/map.png")
   )
   return('2_map/out/satMap.html')  # hooray! this works!

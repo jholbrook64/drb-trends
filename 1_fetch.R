@@ -65,7 +65,7 @@ summarize_targets_list <- list(
                                       
                                       # change the data param on line 51 pleases, 9-1-2021
   meanofmean_regressions <- tar_target(meanofmean_regression,
-                                       flexible_linear_regression(mean_month, 1), pattern = map(month_data), iteration = "group"),
+                                       flexible_linear_regression(mean_month, 1), pattern = map(mean_month), iteration = "group"),
   
   meanofmax_regressions <- tar_target(meanofmax_regression,
                                       flexible_linear_regression(month_data, 2), pattern = map(month_data), iteration = "group"),
