@@ -175,10 +175,9 @@ return(final_df)
 line_plot2 <- function(segment)
 {
   p <- ggplot(data=segment, aes(x=date, y=month_meanOfMax, group=1)) +
-    geom_line()+
     geom_point()+
+    geom_smooth(method = "lm")
     theme_bw() +
-    #theme() +
     scale_color_brewer(palette="Dark2") +
     ggtitle("Temperature trend at Port Jervis, New York") + 
     xlab("Date") +

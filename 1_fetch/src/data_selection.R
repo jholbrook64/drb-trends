@@ -37,7 +37,7 @@ clean_monthly <- function(in_file)
     filter(month_criteria) %>% 
     # the goal here is to set a constraint for the number of months in a year. 
     mutate(months_in_year = 12) %>% # thi one should count the months for each calendar year
-    mutate(year_criteria = months_in_year > 7) %>% 
+    mutate(year_criteria = months_in_year > 8) %>% # should have 9 or more months
     group_by(site_id, month) %>% 
     mutate(n_year = n_distinct(month_year)) %>% 
     #mutate(n_year = floor(n_distinct(month_year)/12)) %>% # remove floor() if it gives problems
@@ -91,6 +91,16 @@ group_time <- function(select_data)
     # mutate(month_meanOfMin = mean(min_temp_c, na.rm = TRUE))
   
   return(data_for_trend_analysis)
+}
+
+# function
+remove_temporal_disconnect <- function(data_for_trend_analysis)
+{
+  obs_date <- lubridate::date(data_for_trend_analysis$date)
+  obs_year <- data_for_trend_analysis$year
+  for (variable in vector) {
+    
+  }
 }
 
 group_year <- function(select_data)

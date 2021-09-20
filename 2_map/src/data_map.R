@@ -8,7 +8,7 @@
 ##
 ## ---------------------------
 ## Notes:
-##     ~
+##     ~  
 ## ---------------------------
 
 boxplot_func <- function(regression_data, type, site_info)
@@ -138,7 +138,6 @@ boxplot_func <- function(regression_data, type, site_info)
   }
 }
 
-# added a third inupuit 8-18-2021
 map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk) 
 {
   browser()
