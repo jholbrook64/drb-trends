@@ -248,6 +248,8 @@ map_tiles <-function(data_for_trend_analysis_month, in_network, in_crosswalk)   
   return('2_map/out/satMap.html')  # hooray! this works!
 }
 
+
+# began modifiying this funciton to do a different thing 9/21/2021
 hist_func <- function(regression_data)
 {
   browser()
@@ -255,13 +257,18 @@ hist_func <- function(regression_data)
   # takes annual data since the boxplots no longer works for annual data:
  # regression_data$seg_id_nat <- as.factor(regression_data$seg_id_nat)
   boxp <- ggplot(regression_data, aes(x = r2))+  #x = seg_id_nat, y = Slope
-    geom_histogram()+
-    ggtitle("Distribution of Stream Segment Trends for Each Segment")+ 
-    xlab("Individual Segments") +
-    ylab("Yearly mean temperatures") +
+    geom_density()+
+    ggtitle("Distribution of Annual Stream Segment Trends for Each Segment")+ 
+    xlab("Trend Value") +
+    ylab("Count") +
     theme(axis.text.x = element_text(angle = 90))
   
   this_filename <-  file.path('2_map', 'out', 'trends_hist.png')
   ggsave(filename = this_filename, boxp, height = 7, width = 12)
   return(this_filename)
+}
+
+overlap_density <-  function(regression_data1, regression_data2, regression_data3)
+{
+  
 }

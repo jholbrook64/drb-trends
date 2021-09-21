@@ -71,10 +71,11 @@ summarize_targets_list <- list(
                                       flexible_linear_regression(month_data, 2), pattern = map(month_data), iteration = "group"),
   
   meanofmin_regressions <- tar_target(meanofmin_regression,
-                                      flexible_linear_regression(month_data, 3), pattern = map(month_data), iteration = "group")#,
+                                      flexible_linear_regression(month_data, 3), pattern = map(month_data), iteration = "group"),
   
-  #Annual_regressions <- tar_target(Annual_regression,
-  #                                 flexible_linear_regression(year_data, 4), pattern = map(year_data), iteration = "group")
+  Annual_regressions <- tar_target(Annual_regression,
+                                  flexible_linear_regression(year_data, 4), pattern = map(year_data), iteration = "group")
+
   )
   # end branched regressions targets
   

@@ -91,7 +91,7 @@ flexible_linear_regression <- function(sites, type)
              sum_lr$coefficients[[2]])
   
   dfstats <- data.frame("site id" = sites$site_id[[1]], 
-                        "Month" = sites$month[[1]],
+                        #"Month" = sites$month[[1]],
                         "max_temp_observed" = max_temp,
                         "mean_monthly_temp" = mean_temp,
                         "min_temp_observed" = min_temp,

@@ -93,26 +93,38 @@ group_time <- function(select_data)
   return(data_for_trend_analysis)
 }
 
-# function
+# function to remove time lags of greater than 3 years
 remove_temporal_disconnect <- function(data_for_trend_analysis)
 {
   obs_date <- lubridate::date(data_for_trend_analysis$date)
-  obs_year <- data_for_trend_analysis$year
-  for (variable in vector) {
-    
-  }
+  # use dplyr::mutate to clean data if tempiral disconnect 
+  data_removed_lags <- data_for_trend_analysis %>% 
+    mutate(year_step = year - lag(year)) %>% 
+    filter(year_step > 3)
+    # this takes in either month or year data? should be able to do both
+  return(data_removed_lags)
 }
 
 group_year <- function(select_data)
 {
-  year_trend_analysis <- select_data %>% 
-    mutate(year = lubridate::year(date)) %>%
-    group_by(year) %>% 
-    mutate(annual_mean = mean(mean_temp_degC, na.rm = TRUE)) %>%
-    mutate(annual_meanOfMax = mean(max_temp_degC, na.rm = TRUE)) %>%
-    mutate(annual_meanOfMin = mean(min_temp_degC, na.rm = TRUE)) %>% 
-    drop_na(annual_mean, annual_meanOfMax, annual_meanOfMin)
+  # old on ethat had way too many residuals:
+  # year_trend_analysis <- select_data %>% 
+  #   mutate(year = lubridate::year(date)) %>%
+  #   group_by(year) %>% 
+  #   mutate(annual_mean = mean(mean_temp_degC, na.rm = TRUE)) %>%
+  #   mutate(annual_meanOfMax = mean(max_temp_degC, na.rm = TRUE)) %>%
+  #   mutate(annual_meanOfMin = mean(min_temp_degC, na.rm = TRUE)) %>% 
+  #   drop_na(annual_mean, annual_meanOfMax, annual_meanOfMin)
   
+  year_trend_analysis <- select_data %>% 
+    mutate(year = lubridate::year(date)) %>% 
+    group_by(year, site_id) %>% 
+    summarize(annual_mean = mean(mean_temp_degC, na.rm = TRUE),
+              annaul_meanOfMax = mean(max_temp_degC , na.rm = TRUE),
+              annual_meanOfMin = mean(min_temp_degC, na.rm = TRUE),
+              nyear = median(n_year),
+              date = median(date)
+    )
   return(year_trend_analysis)
 }
 

@@ -37,25 +37,6 @@ meta_summaries <- list(
                filter(month == 7)),
   
   tar_target(line_plot2, line_plot2(look_at_this_segment3), format = 'file')
-  # tar_target(look_at_this_segment4, month_data %>%
-  #              filter(seg_id_nat == 1573) %>%
-  #              filter(month == 5)),
-  # tar_target(look_at_this_segment5, month_data %>%
-  #              filter(seg_id_nat == 1568) %>%
-  #              filter(month == 10))
-              # min
-  
-  # other method of making targets list - I believe this is incorrect
-  # regression_table <- list(regress_data_monthMeans, regress_data_monthMaxs, regress_data_monthMins,
-  #                           regress_data_annual)
-  
-  # regression_table <- list(combined_monthMean, combined_monthMax, combined_monthMin,
-  #                         combined_annual)
-  
-  # this should be the loop-through function that meakes a meta-syummary for each dataframe
-  # for (i in length(regression_table)) {
-  #   tar_target(table_summary, summarize_table(regression_table[i]))
-  # }
-  # 
+
   
 )
