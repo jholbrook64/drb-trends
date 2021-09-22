@@ -126,10 +126,6 @@ filter_monthly_data <- function(in_file){
     left_join(keeps) %>%
     filter(!is.na(series_id))
 
-  ggplot(keeps) +
-    geom_tile(aes(x = series_id, y = year)) +
-    facet_wrap(~month)
-
   return(dat_out)
 }
 
@@ -147,18 +143,13 @@ filter_data <- function(clean_monthly)
   return(select_data)
 }
 
-group_time <- function(select_data)
-{
-
+group_time <- function(select_data){
   data_for_trend_analysis <- select_data %>%
     mutate(year = lubridate::year(date)) %>%
-    group_by(month, year, site_id) %>%
+    group_by(site_id, series, series_id, year, month) %>%
     summarize(month_mean = mean(mean_temp_degC, na.rm = TRUE),
               month_meanOfMax = mean(max_temp_degC , na.rm = TRUE),
-              month_meanOfMin = mean(min_temp_degC, na.rm = TRUE),
-              nyear = median(n_year),
-              date = median(date)
-              )
+              month_meanOfMin = mean(min_temp_degC, na.rm = TRUE))
     # summarize(month_meanOfMax = mean(max_temp_degC , na.rm = TRUE)) %>%
     # summarize(month_meanOfMin = mean(min_temp_degC, na.rm = TRUE))
 
@@ -211,7 +202,6 @@ clean_monthly_mean <- function(all_data)
 
 tile_plot_func <- function(data_for_trend_analysis)
 {
-  browser()
 
   # select_data <- data_for_trend_analysis %>%
   #   group_by(site_id) %>%
