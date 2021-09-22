@@ -128,6 +128,90 @@ filter_monthly_data <- function(in_file){
 
   return(dat_out)
 }
+filter_annual_data <- function(in_file){
+  # all seg_id_nat were changed to site_id
+  dat <- readRDS(in_file)
+  dat <- dat %>%
+    drop_na(site_id) %>%
+    drop_na(mean_temp_degC) %>%
+    mutate(year = lubridate::year(date),
+           month = lubridate::month(date))
+
+
+  # filter out months that have more than two missing days of observations
+  # make sure sites have at least 15 years of data
+  dat <- dat %>%
+    group_by(site_id, year, month) %>%
+    mutate(n_per_month = n_distinct(date)) %>%
+    mutate(days_in_month = lubridate::days_in_month(date)) %>%
+    filter(n_per_month >= (days_in_month-4)) %>% ungroup() %>%
+    group_by(site_id, year) %>%
+    filter(n_distinct(month) == 12) %>% ungroup() %>%
+    group_by(site_id) %>%
+    mutate(n_year = n_distinct(year)) %>%
+    ungroup() %>%
+    filter(n_year >= 15)
+
+  # now look for sites that have at least 15 years of data,
+  # with no more than a 3 year gap (so >=4)
+  year_dat <- ungroup(dat) %>%
+    select(site_id, year) %>%
+    distinct() %>%
+    arrange(site_id, year) %>%
+    group_by(site_id) %>%
+    mutate(year_diff = c(NA, diff(year))) %>% ungroup()
+
+  # Let's exclude data after big gaps (>10 years)
+  # and if a site still has >15 years of data, let's just drop
+  # the most recent data
+
+  # first, keep sites with no gaps >4
+  no_gaps_keep <- group_by(year_dat, site_id) %>%
+    filter(max(year_diff, na.rm = TRUE) <= 4) %>%
+    select(site_id, year) %>%
+    distinct() %>%
+    mutate(series = 'whole')
+
+  # next, check for data around gaps
+  # if a site-month is missing 4-10 years,
+  # keep if there are >10 years before/after the gap
+  gaps_keep <- group_by(year_dat, site_id) %>%
+    filter(max(year_diff, na.rm = TRUE) > 4 & max(year_diff, na.rm = TRUE) <= 10) %>%
+    filter((sum(year >= year[which.max(year_diff)]) >= 10) & (sum(year < year[which.max(year_diff)]) >= 10)) %>% ungroup() %>%
+    mutate(series = 'whole')
+
+  # next, for sites that have >10 year gap
+  # break the data up into two chunks
+  # if there are >15 years of data, analyze the chunks seperately
+  big_gaps_test <- group_by(year_dat, site_id) %>%
+    filter(max(year_diff, na.rm = TRUE) > 10) %>%
+    mutate(series = if_else(year < year[which.max(year_diff)], 'early', 'late')) %>%
+    group_by(site_id, series) %>%
+    mutate(n_diff2 = c(NA, diff(year))) %>%
+    mutate(n_per_series = n(),
+           max_gap_series = max(n_diff2, na.rm = TRUE)) %>%
+    ungroup()
+
+  # keep those that meet our 15 year & gap criteria
+  big_gaps_keep1 <- big_gaps_test %>%
+    filter(n_per_series >= 15 & max_gap_series <= 4)
+
+  # turns out no sites meet this criteria, so we can drop this test in the future and stop looking for splits
+
+  # no more potential keeps
+  # let's bind all the keeps together
+  keeps <- bind_rows(no_gaps_keep, gaps_keep, big_gaps_keep1) %>%
+    ungroup() %>%
+    select(site_id, year, series) %>%
+    mutate(series_id = paste(site_id, series, sep = '_')) %>%
+    distinct()
+
+  dat_out <- dat %>%
+    left_join(keeps) %>%
+    filter(!is.na(series_id))
+
+  return(dat_out)
+}
 
 filter_data <- function(clean_monthly)
 {
@@ -183,11 +267,10 @@ remove_temporal_disconnect <- function(data_for_trend_analysis)
 group_year <- function(select_data)
 {
   year_trend_analysis <- select_data %>%
-    mutate(year = lubridate::year(date)) %>%
-    group_by(year) %>%
-    mutate(annual_mean = mean(mean_temp_degC, na.rm = TRUE)) %>%
-    mutate(annual_meanOfMax = mean(max_temp_degC, na.rm = TRUE)) %>%
-    mutate(annual_meanOfMin = mean(min_temp_degC, na.rm = TRUE)) %>%
+    group_by(site_id, series, year) %>%
+    summarize(annual_mean = mean(mean_temp_degC, na.rm = TRUE),
+              annual_meanOfMax = mean(max_temp_degC, na.rm = TRUE),
+              annual_meanOfMin = mean(min_temp_degC, na.rm = TRUE)) %>%
     drop_na(annual_mean, annual_meanOfMax, annual_meanOfMin)
 
   return(year_trend_analysis)
