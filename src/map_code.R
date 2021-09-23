@@ -26,7 +26,7 @@ map_sites <- function(in_dat, in_network) {
     # color by how much data a segment has
     geom_sf(data = filter(net_d, !is.na(n_all_time)), aes(color = n_all_time)) +
     # change color scale
-    scale_color_viridis_c(direction = -1, option = 'plasma', end = 0.95) +
+    scale_color_viridis_c(direction = -1, option = 'plasma', end = 1) +
     theme_bw()
   
   ggsave('out/example_plot.png', p, height = 7, width = 5)
