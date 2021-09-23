@@ -227,45 +227,34 @@ filter_data <- function(clean_monthly)
   return(select_data)
 }
 
-group_time <- function(select_data){
+group_time <- function(select_data)
+{
   data_for_trend_analysis <- select_data %>%
     mutate(year = lubridate::year(date)) %>%
     group_by(site_id, series, series_id, year, month) %>%
     summarize(month_mean = mean(mean_temp_degC, na.rm = TRUE),
               month_meanOfMax = mean(max_temp_degC , na.rm = TRUE),
               month_meanOfMin = mean(min_temp_degC, na.rm = TRUE))
-    # summarize(month_meanOfMax = mean(max_temp_degC , na.rm = TRUE)) %>%
-    # summarize(month_meanOfMin = mean(min_temp_degC, na.rm = TRUE))
-
-    # data_for_trend_analysis <- select_data %>%
-    # mutate(year = lubridate::year(date)) %>%
-    # group_by(month, year, site_id) %>%
-    # summarize(month_meanOfMax = mean(max_temp_degC , na.rm = TRUE))
-
-    # mutate(month_mean = mean(mean_temp_degC, na.rm = TRUE)) %>%
-    # mutate(month_meanOfMax = mean(max_temp_degC, na.rm = TRUE)) %>%
-    # mutate(month_meanOfMin = mean(min_temp_degC, na.rm = TRUE)) %>%
-    # group_by(month, site_id)
-
-    # mutate(month_mean = mean(mean_temp_c, na.rm = TRUE)) %>%
-    # mutate(month_meanOfMax = mean(max_temp_c, na.rm = TRUE)) %>%
-    # mutate(month_meanOfMin = mean(min_temp_c, na.rm = TRUE))
 
   return(data_for_trend_analysis)
 }
 
-# function
+# function to remove time lags of greater than 3 years
 remove_temporal_disconnect <- function(data_for_trend_analysis)
 {
   obs_date <- lubridate::date(data_for_trend_analysis$date)
-  obs_year <- data_for_trend_analysis$year
-  for (variable in vector) {
 
-  }
+  # use dplyr::mutate to clean data if tempiral disconnect 
+  data_removed_lags <- data_for_trend_analysis %>% 
+    mutate(year_step = year - lag(year)) %>% 
+    filter(year_step > 3)
+    # this takes in either month or year data? should be able to do both
+  return(data_removed_lags)
 }
 
 group_year <- function(select_data)
 {
+
   year_trend_analysis <- select_data %>%
     group_by(site_id, series, year) %>%
     summarize(annual_mean = mean(mean_temp_degC, na.rm = TRUE),

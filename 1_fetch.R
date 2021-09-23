@@ -52,6 +52,7 @@ fetch_targest_list <- list(
              flexible_linear_regression(mean_monthly_data_g, 2), pattern = map(mean_monthly_data_g), iteration = "group"),
 
   meanofmin_regressions <- tar_target(meanofmin_regression,
+
              flexible_linear_regression(mean_monthly_data_g, 3), pattern = map(mean_monthly_data_g), iteration = "group"),
 
   annual_regressions <- tar_target(annual_regression,
@@ -62,5 +63,6 @@ fetch_targest_list <- list(
   tar_combine(regress_data_monthMaxs, meanofmax_regressions),
   tar_combine(regress_data_monthMins, meanofmin_regressions)
   #tar_combine(regress_data_annual, annual_regressions)
+
 )
 
