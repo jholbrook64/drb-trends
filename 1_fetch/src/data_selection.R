@@ -259,7 +259,8 @@ group_year <- function(select_data)
     group_by(site_id, series, year) %>%
     summarize(annual_mean = mean(mean_temp_degC, na.rm = TRUE),
               annual_meanOfMax = mean(max_temp_degC, na.rm = TRUE),
-              annual_meanOfMin = mean(min_temp_degC, na.rm = TRUE)) %>%
+              annual_meanOfMin = mean(min_temp_degC, na.rm = TRUE),
+              month = NA) %>%
     drop_na(annual_mean, annual_meanOfMax, annual_meanOfMin)
 
   return(year_trend_analysis)

@@ -1,0 +1,28 @@
+seg_id_nat,site.id,n_per_site,reservoir_impacted,reservoir_code,notes
+1450,USGS-01417500,12079,TRUE,4,below Pepacton; East @ Harvard
+1457,USGS-01420500,7835,FALSE,0,Beaver Kill
+1462,USGS-01421000,16815,TRUE,4,below Pepacton; East @ Fish Eddy
+1498,USGS-01463500,15802,TRUE,1,but far downstream - maybe need to code differently?
+1565,USGS-01426500,14148,TRUE,4,below Cannonsville; WB @ Hale Eddy
+1566,USGS-01425000,17005,TRUE,4,just below Cannonsville; WB @ Stilesville
+1568,USGS-01428500,15704,TRUE,1,but relatively far downstream - maybe need to code differently?
+1573,USGS-01427207,3265,TRUE,4,Below Pepacton and Cannonsville; DR @ Lordville
+1578,USGS-01427510,12905,TRUE,4,DR @ Callicoon (below Lordsville)
+1586,USGS-01428750,5997,FALSE,0,W Lackawaxen above Prompton
+1588,USGS-01429000,6753,TRUE,3,W Lackawaxen below Prompton Reservoir
+1641,USGS-01436690,7820,TRUE,4,below Neversink; NR@Bridgeville
+1656,USGS-01432805,12564,TRUE,1,DR @ Pond Eddy just above Port Jervus
+1658,USGS-01434000,6495,TRUE,1,DR @ Port Jervis which is above NR and DR confluence
+1683,USGS-01447500,7193,TRUE,2,but downstream of minor reservoirs (Arrowhead Lake and Bradys Lake) - maybe reclassify?
+1684,USGS-01447720,8555,TRUE,2,but downstream of minor reservoir (Pocono Lake) - maybe reclassify?
+1695,USGS-01447800,6495,TRUE,3,Lehigh below Francis E. Walter Reservoir
+1703,USGS-01449360,12837,FALSE,0,above Beltzville reservoir
+1794,USGS-01466500,12257,FALSE,0,
+2012,USGS-01480870,9169,TRUE,2,but downstream of minor reservoir (Marsh Creek and Struble)
+2014,USGS-01480617,9173,TRUE,2,but downstream of minor reservoirs (Birch Run and Coatesville); this site should not be on same segment as 01480870
+2037,USGS-01481000,12318,TRUE,2,but below a number of small reservoirs
+2338,USGS-01474500,3023,TRUE,2,but below a number of small reservoirs
+,USGS-01432160,,TRUE,1,DR @ Barryville above Port Jervis
+,USGS-01467200,,TRUE,,DR @ Penn's Landing at Philadelphia - note this has estuary influence
+,USGS-01477050,,TRUE,,DR @ Chester - note this has estuary influence
+,USGS-01474703,,TRUE,,DR @ Fort Mifflin - note this has estuary influence

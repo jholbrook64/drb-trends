@@ -1,24 +1,4 @@
-<<<<<<< HEAD
-source('src/time_summaries.R')
 
-tar_option_set(packages = c('sf', 'tidyverse', 'mapview'))
-
-p1_targets_list <- list(
-  tar_target(annual_summary, 
-               evaluate_annual('in/obs_temp_drb.rds')),
-  
-  tar_target(monthly_summary,
-             evaluate_monthly('in/obs_temp_drb.rds')), #, format = 'file'
-  
-  tar_target(clean_Monthly,
-             clean_monthly('in/obs_temp_drb.rds')),
-  
-  tar_target(add_days,                            # take return of the previous target
-             add_days_in_month(clean_Monthly)) #, format = 'file'
-
-  # add_days goes straight to the function group_time, which return target time_grouped
-  )
-=======
 ## ---------------------------
 ##
 ## Script name: 1_fetch.R
@@ -73,12 +53,17 @@ fetch_targest_list <- list(
              flexible_linear_regression(mean_monthly_data_g, 2), pattern = map(mean_monthly_data_g), iteration = "group"),
 
   meanofmin_regressions <- tar_target(meanofmin_regression,
-
              flexible_linear_regression(mean_monthly_data_g, 3), pattern = map(mean_monthly_data_g), iteration = "group"),
 
   annual_regressions <- tar_target(annual_regression,
-                                   flexible_linear_regression(mean_annual_data_g, 4), pattern = map(mean_annual_data_g), iteration = "group"),
+             flexible_linear_regression(mean_annual_data_g, 4), pattern = map(mean_annual_data_g), iteration = "group"),
+  
+  # tar_target(bind_regressions,
+  #            merge(meanofmean_regression, meanofmax_regression, meanofmin_regression, all.x = TRUE)),
 
+  tar_target(bind_regressions,
+             bind_rows(list(mean = meanofmean_regression, max = meanofmax_regression, min = meanofmin_regression), .id = "regression_type")),
+  
   # combine targets
   tar_combine(regress_data_monthMeans, meanofmean_regressions),
   tar_combine(regress_data_monthMaxs, meanofmax_regressions),
@@ -87,4 +72,3 @@ fetch_targest_list <- list(
 
 )
 
->>>>>>> 3ccdbf1aecf0e4257668c4dd8e48d792ac8ec577

@@ -13,7 +13,7 @@
 
 flexible_linear_regression <- function(sites, type)
 {
-
+browser()
   #where sites is each branched target, and type is the type of linear regression that is be run
   if (type == 1) {
 
@@ -76,7 +76,7 @@ flexible_linear_regression <- function(sites, type)
     {
       return(
         dfstats <- data.frame("site id" = sites$site_id[[1]],
-                              #"Month" = sites$month[[1]],
+                              "Month" = sites$month[[1]],
                               "series" = sites$series[1],
                               "max_temp_observed" = NA,
                               "mean_monthly_temp" = NA,
@@ -183,18 +183,35 @@ bind_transposed <- function(df_positive_transpose, df_negative_transpose)
   return(final_df)
 }
 
-line_plot2 <- function(segment)
+line_plot2 <- function(annual_data)
 {
-  p <- ggplot(data=segment, aes(x=date, y=month_meanOfMax, group=1)) +
+  
+  p <- ggplot(data = annual_data, aes(x=year, y= annual_mean
+  )) +
     geom_point()+
-    geom_smooth(method = "lm")
-  theme_bw() +
-    scale_color_brewer(palette="Dark2") +
-    ggtitle("Temperature trend at Port Jervis, New York") +
+    theme_bw() +
+    ggtitle("Trend in Annual Temperature values for Observed sites") + 
     xlab("Date") +
-    ylab("Max Daily Temperature")
+    ylab("Mean Annual Temperature in Celsius") +
+    geom_smooth(method = "lm")
+  
+  this_filename <-  file.path('3_summarize/', 'out/', 'line_plot', '.png', fsep = "")
+  ggsave(filename = this_filename, p, height = 7, width = 12)
+  return(this_filename)
+}
 
-  this_filename <-  file.path('3_summarize/', 'out/', 'line_plot_july', '.png', fsep = "")
+
+density_plot <- function(annual_data)
+{
+  p <- ggplot(data = annual_data, aes(x=Slope)) +
+    geom_density(fill="#69b3a2", color="#e9ecef", alpha=0.8)+
+    theme_bw() +
+    scale_color_brewer(palette="Dark2") +
+    ggtitle("Distribution of Warming Trends Across Selected Sites") + 
+    xlab("warming trend in degrees Celsius / year") +
+    ylab("Number of Observed Sites") 
+  
+  this_filename <-  file.path('3_summarize/', 'out/', 'denisty_plot_annual', '.png', fsep = "")
   ggsave(filename = this_filename, p, height = 7, width = 12)
   return(this_filename)
 }
