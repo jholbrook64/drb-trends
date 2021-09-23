@@ -13,30 +13,42 @@
 
 flexible_linear_regression <- function(sites, type)
 {
-  
-  #browser()
-  
-  #where sites is each branched target, and type is the type of linear regression that is be run 
-  if (type == 1)
-  {
-    sites <- sites %>% 
-      drop_na(month_mean)
-                # make this for every ifelse case
-    
-    
-    lr <- lm(month_mean ~ year, data = sites)
-    sum_lr <- summary(lr)
-    rs <- sum_lr$r.squared
-    p_vlaue <- sum_lr$coefficients[,4][2]
-    max_temp <-  max(sites$month_mean, na.rm = TRUE)
-    mean_temp <- mean(sites$month_mean, na.rm = TRUE)
-    min_temp <-  min(sites$month_mean, na.rm = TRUE)
-  }
-  else if (type == 2)
-  {
-    sites <- sites %>% 
+
+  #where sites is each branched target, and type is the type of linear regression that is be run
+  if (type == 1) {
+
+
+
+    if(all(is.nan(sites$month_mean))){
+      dfstats <- data.frame("site id" = sites$site_id[[1]],
+                            "series" = sites$series[1],
+                            "Month" = sites$month[[1]],
+                            "max_temp_observed" = NA,
+                            "mean_monthly_temp" = NA,
+                            "min_temp_observed" = NA,
+                            #"Date Range" = lubridate::as.interval(start = sites$date[[1]], sites$date[[nrow(sites)]]),
+                            "years" = NA,
+                            "Slope" = NA,
+                            "p_value" = NA,
+                            "is_significant" = NA,
+                            "r2" = NA)
+      return(dfstats)
+    } else {
+      sites <- sites %>%
+        drop_na(month_mean)
+      lr <- lm(month_mean ~ year, data = sites)
+      sum_lr <- summary(lr)
+      rs <- sum_lr$r.squared
+      p_vlaue <- sum_lr$coefficients[,4][2]
+      max_temp <-  max(sites$month_mean, na.rm = TRUE)
+      mean_temp <- mean(sites$month_mean, na.rm = TRUE)
+      min_temp <-  min(sites$month_mean, na.rm = TRUE)
+
+    }
+  } else if (type == 2) {
+    sites <- sites %>%
       drop_na(month_meanOfMax)
- 
+
     lr <- lm(month_meanOfMax ~ year, data = sites)
     sum_lr <- summary(lr)
     rs <- sum_lr$r.squared
@@ -44,73 +56,72 @@ flexible_linear_regression <- function(sites, type)
     max_temp <-  max(sites$month_meanOfMax, na.rm = TRUE)
     mean_temp <- mean(sites$month_meanOfMax, na.rm = TRUE)
     min_temp <-  min(sites$month_meanOfMax, na.rm = TRUE)
-  }
-  else if (type == 3)
-  {
-    sites <- sites %>% 
+
+  } else if (type == 3) {
+
+    sites <- sites %>%
       drop_na(month_meanOfMin)
-    
+
     lr <- lm(month_meanOfMin ~ year, data = sites)
     sum_lr <- summary(lr)
-    rs <- sum_lr$r.squared 
+    rs <- sum_lr$r.squared
     p_vlaue <- sum_lr$coefficients[,4][2]
     max_temp <-  max(sites$month_meanOfMin, na.rm = TRUE)
     mean_temp <- mean(sites$month_meanOfMin, na.rm = TRUE)
     min_temp <-  min(sites$month_meanOfMin, na.rm = TRUE)
-  }
-  else if (type == 4)
-  {
+  } else if (type == 4) {
     # kept as of 12:34 pm on monday 8-2
     # here there is a problem of one of the targets having all NA values
     if(all(is.nan(sites$annual_mean)))
     {
-      return(  dfstats <- data.frame("site id" = sites$site_id[[1]], 
-                                     "Month" = sites$month[[1]],
-                                     "max_temp_observed" = 0,
-                                     "mean_monthly_temp" = 0,
-                                     "min_temp_observed" = 0,
-                                     "Date Range" = lubridate::as.interval(start = sites$date[[1]], sites$date[[nrow(sites)]]),
-                                     "years" = sites$nyear[[1]],
-                                     "Slope" = 0,
-                                     "p_value" = 0,
-                                     "is_significant" = 0,
-                                     "r2" = 0
-      ))
-    }
-    else{
-    lr <- lm(annual_mean ~ year, data = sites)
-    sum_lr <- summary(lr)
-    rs <- sum_lr$r.squared
-    p_vlaue <- sum_lr$coefficients[,4][2]
-    max_temp <-  max(sites$annual_mean, na.rm = TRUE)
-    mean_temp <- mean(sites$annual_mean, na.rm = TRUE)
-    min_temp <-  min(sites$annual_mean, na.rm = TRUE)
+      return(
+        dfstats <- data.frame("site id" = sites$site_id[[1]],
+                              #"Month" = sites$month[[1]],
+                              "series" = sites$series[1],
+                              "max_temp_observed" = NA,
+                              "mean_monthly_temp" = NA,
+                              "min_temp_observed" = NA,
+                              #"Date Range" = lubridate::as.interval(start = sites$date[[1]], sites$date[[nrow(sites)]]),
+                              "years" = NA,
+                              "Slope" = NA,
+                              "p_value" = NA,
+                              "is_significant" = NA,
+                              "r2" = NA)
+      )
+    } else {
+      lr <- lm(annual_mean ~ year, data = sites)
+      sum_lr <- summary(lr)
+      rs <- sum_lr$r.squared
+      p_vlaue <- sum_lr$coefficients[,4][2]
+      max_temp <-  max(sites$annual_mean, na.rm = TRUE)
+      mean_temp <- mean(sites$annual_mean, na.rm = TRUE)
+      min_temp <-  min(sites$annual_mean, na.rm = TRUE)
     }
   }
   stats <- c(sum_lr$coefficients[[1]],
              sum_lr$coefficients[[2]])
-  
-  dfstats <- data.frame("site id" = sites$site_id[[1]], 
-                        #"Month" = sites$month[[1]],
+
+  dfstats <- data.frame("site id" = sites$site_id[[1]],
+                        "Month" = sites$month[[1]],
+                        "series" = sites$series[1],
                         "max_temp_observed" = max_temp,
                         "mean_monthly_temp" = mean_temp,
                         "min_temp_observed" = min_temp,
-                        "Date Range" = lubridate::as.interval(start = sites$date[[1]], sites$date[[nrow(sites)]]),
-                        "years" = sites$nyear[[1]],
+                        #"Date Range" = lubridate::as.interval(start = sites$year[[1]], sites$year[[nrow(sites)]]),
+                        "years" = length(unique(sites$year)),
                         "Slope" = stats[2],
                         #"r" = rs^(1/2),
                         "p_value" = p_vlaue,
                         "is_significant" = p_vlaue < 0.01,
-                        "r2" = rs
-                        )
+                        "r2" = rs)
   return(dfstats)
 }
 
 summarize_table <- function(regression_table)
 {
-  summaryT <- regression_table %>% 
-    group_by(Month) %>% 
-    summarise(Min_slope = min(Slope), 
+  summaryT <- regression_table %>%
+    group_by(Month) %>%
+    summarise(Min_slope = min(Slope),
               Max_slope = max(Slope),
               strongest_correlation = max(r2),
               max_temp_observed = max(max_temp_observed),
@@ -118,19 +129,19 @@ summarize_table <- function(regression_table)
               sd_across_branches = sd(mean_monthly_temp),
               Quartile_range_across_branches = IQR(mean_monthly_temp),
               longest_observation = max(years))
-  
+
   return(summaryT)
 }
 
 write_summary_positive <- function(dfstats)
 {
-#These will only include metrics from the month of July since that is the hottest month on record
-  month_table <- dfstats %>% 
-    filter(Month == 7) %>% 
+  #These will only include metrics from the month of July since that is the hottest month on record
+  month_table <- dfstats %>%
+    filter(Month == 7) %>%
     filter(Slope > 0.0)
 
   df_positive <-  data.frame(
-   # "Positive values" = NULL,
+    # "Positive values" = NULL,
     "median_temp" = median(month_table$mean_monthly_temp),
     "greatest_change" = max(month_table$Slope),
     "median_change" = median(month_table$Slope),
@@ -147,18 +158,18 @@ write_summary_positive <- function(dfstats)
 
 write_summary_negative <- function(dfstats)
 {
-  month_table <- dfstats %>% 
-    filter(Month == 7) %>% 
+  month_table <- dfstats %>%
+    filter(Month == 7) %>%
     filter(Slope < 0.0)
-  
+
   df_negative <-  data.frame(
-  #"Negative values" = NULL,
-  "median_temp" = median(month_table$mean_monthly_temp),
-  "greatest_change" = max(month_table$Slope),
-  "median_change" = median(month_table$Slope), 
-  "least_change" = min(month_table$Slope)
+    #"Negative values" = NULL,
+    "median_temp" = median(month_table$mean_monthly_temp),
+    "greatest_change" = max(month_table$Slope),
+    "median_change" = median(month_table$Slope),
+    "least_change" = min(month_table$Slope)
   )
-  
+
   df_negative_transpose <- as.data.frame(t(as.matrix(df_negative)))
   seg_id_vect <- c(match(median(month_table$mean_monthly_temp),month_table), match(max(month_table$Slope),month_table),
                    match(median(month_table$Slope),month_table), match(min(month_table$Slope),month_table))
@@ -168,8 +179,8 @@ write_summary_negative <- function(dfstats)
 
 bind_transposed <- function(df_positive_transpose, df_negative_transpose)
 {
-final_df <- bind_rows(df_positive_transpose, df_negative_transpose)
-return(final_df)
+  final_df <- bind_rows(df_positive_transpose, df_negative_transpose)
+  return(final_df)
 }
 
 line_plot2 <- function(segment)
@@ -177,12 +188,12 @@ line_plot2 <- function(segment)
   p <- ggplot(data=segment, aes(x=date, y=month_meanOfMax, group=1)) +
     geom_point()+
     geom_smooth(method = "lm")
-    theme_bw() +
+  theme_bw() +
     scale_color_brewer(palette="Dark2") +
-    ggtitle("Temperature trend at Port Jervis, New York") + 
+    ggtitle("Temperature trend at Port Jervis, New York") +
     xlab("Date") +
-    ylab("Max Daily Temperature") 
-  
+    ylab("Max Daily Temperature")
+
   this_filename <-  file.path('3_summarize/', 'out/', 'line_plot_july', '.png', fsep = "")
   ggsave(filename = this_filename, p, height = 7, width = 12)
   return(this_filename)
