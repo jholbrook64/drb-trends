@@ -177,30 +177,6 @@ write_summary_negative <- function(dfstats)
   return(df_negative_transpose)
 }
 
-bind_transposed <- function(df_positive_transpose, df_negative_transpose)
-{
-  final_df <- bind_rows(df_positive_transpose, df_negative_transpose)
-  return(final_df)
-}
-
-line_plot2 <- function(annual_data)
-{
-  
-  p <- ggplot(data = annual_data, aes(x=year, y= annual_mean
-  )) +
-    geom_point()+
-    theme_bw() +
-    ggtitle("Trend in Annual Temperature values for Observed sites") + 
-    xlab("Date") +
-    ylab("Mean Annual Temperature in Celsius") +
-    geom_smooth(method = "lm")
-  
-  this_filename <-  file.path('3_summarize/', 'out/', 'line_plot', '.png', fsep = "")
-  ggsave(filename = this_filename, p, height = 7, width = 12)
-  return(this_filename)
-}
-
-
 density_plot <- function(annual_data)
 {
   p <- ggplot(data = annual_data, aes(x=Slope)) +
