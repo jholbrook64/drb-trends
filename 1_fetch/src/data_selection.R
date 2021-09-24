@@ -31,7 +31,6 @@ filter_monthly_data <- function(in_file){
     filter(month_criteria) %>%
     group_by(site_id, month) %>%
     mutate(n_year = n_distinct(month_year)) %>%
-    #mutate(n_year = floor(n_distinct(month_year)/12)) %>% # remove floor() if it gives problems
     ungroup() %>%
     filter(n_year >= 15)
 
@@ -66,7 +65,7 @@ filter_monthly_data <- function(in_file){
 
   # next, for sites that have >10 year gap
   # break the data up into two chunks
-  # if there are >15 years of data, analyze the chunks seperately
+  # if there are >15 years of data, analyze the chunks separately
   big_gaps_test <- group_by(year_dat, site_id, month) %>%
     filter(max(year_diff, na.rm = TRUE) > 10) %>%
     mutate(series = if_else(year < year[which.max(year_diff)], 'early', 'late')) %>%
@@ -182,7 +181,7 @@ filter_annual_data <- function(in_file){
 
   # next, for sites that have >10 year gap
   # break the data up into two chunks
-  # if there are >15 years of data, analyze the chunks seperately
+  # if there are >15 years of data, analyze the chunks separately
   big_gaps_test <- group_by(year_dat, site_id) %>%
     filter(max(year_diff, na.rm = TRUE) > 10) %>%
     mutate(series = if_else(year < year[which.max(year_diff)], 'early', 'late')) %>%
@@ -219,8 +218,7 @@ filter_data <- function(clean_monthly)
     group_by(site_id) %>%
     mutate(start_date_id = min(date)) %>%
     mutate(end_date_id = max(date)) %>%
-    filter(start_date_id <= as.Date("1990-01-01")) %>%  # this is taken away to look at data temporal distribution 8/30/21
-    #filter(end_date_id >= as.Date("2010-01-01")) %>%
+    filter(start_date_id <= as.Date("1990-01-01")) %>%
     filter(end_date_id >= as.Date("2020-12-31")) %>%
     ungroup()
 
@@ -237,19 +235,6 @@ group_time <- function(select_data)
               month_meanOfMin = mean(min_temp_degC, na.rm = TRUE))
 
   return(data_for_trend_analysis)
-}
-
-# function to remove time lags of greater than 3 years
-remove_temporal_disconnect <- function(data_for_trend_analysis)
-{
-  obs_date <- lubridate::date(data_for_trend_analysis$date)
-
-  # use dplyr::mutate to clean data if tempiral disconnect 
-  data_removed_lags <- data_for_trend_analysis %>% 
-    mutate(year_step = year - lag(year)) %>% 
-    filter(year_step > 3)
-    # this takes in either month or year data? should be able to do both
-  return(data_removed_lags)
 }
 
 group_year <- function(select_data)
@@ -271,50 +256,4 @@ clean_monthly_mean <- function(all_data)
   noNA_data <- all_data %>%
     drop_na(month_mean)
   return(noNA_data)
-}
-
-tile_plot_func <- function(data_for_trend_analysis)
-{
-
-  # select_data <- data_for_trend_analysis %>%
-  #   group_by(site_id) %>%
-  #   mutate(start_date_id = min(date)) %>%
-  #   mutate(end_date_id = max(date)) %>%
-  #   filter(start_date_id <= as.Date("1990-01-01")) %>%  # this is taken away to look at data temporal distribution 8/30/21
-  #   #filter(end_date_id >= as.Date("2010-01-01")) %>%
-  #   filter(end_date_id >= as.Date("2020-12-31")) %>%
-  #   ungroup()
-
-  data_for_trend_analysis <-
-    data_for_trend_analysis %>%
-    group_by(month, site_id) %>%
-    mutate(instance = 1) %>%
-    ungroup()
-
-  count_sites <-
-    data_for_trend_analysis %>%
-      group_by(month, site_id) %>%
-      filter(nyear > 27) %>%
-      #mutate(sparse = sum(filter(nyear >22))) %>%
-      mutate(instance = 1) %>%
-      ungroup()
-
-  #code sam provided:
-  all_sites <- data_for_trend_analysis %>%  mutate(selected = site_id %in% unique(count_sites$site_id))
-
-  #data_for_trend_analysis$month_mean <- as.numeric(data_for_trend_analysis$month_mean)
-
-  tile_p <- ggplot(all_sites, aes(x = year, y = site_id)) +
-              geom_tile(mapping = aes(fill = selected))
-
-
-  #                    list(geom_tile(mapping = aes(fill = count(instance))),#count(data_for_trend_analysis, vars = year, month))) +
-  #                              scale_fill_distiller(palette = "YlGnBu"),
-  #                              labs(title = "count of records",
-  #                                   x = "year",
-  #                                   y = "month")))
-
-    this_filename <- file.path('1_fetch', 'out', 'tile_plot_monthly_.png')
-    ggsave(filename = this_filename, tile_p, height = 7, width = 12)
-    return(this_filename)
 }
