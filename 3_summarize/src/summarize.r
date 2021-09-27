@@ -32,24 +32,25 @@ line_plot_function <- function(temp_data)
   browser()
   #making a date vector
   temp_data <- temp_data %>% filter(month ==7)
-  temp_data$Date <- with(temp_data, sprintf("%d-%02d", year, month))
-  temp_data$Date <- as.Date(temp_data$Date, format='%m/%d')
-  #temp_data$Date <- zoo::as.yearmon(paste(df$year, df$month), "%Y %m")
-  p <- ggplot(data = temp_data, aes(x=Date, y= month_mean), group =1) +
+  temp_data$Date <- paste(temp_data$year, temp_data$month)
+
+  p <- ggplot(data = subset(temp_data, !is.na(month_mean)), aes(x=Date, y= month_mean), group =1) +
     geom_point()+
+    geom_abline() +
+    #geom_smooth(method = "lm")+
     theme_bw() +
-    geom_smooth(method = "lm")+
+    
     ggtitle("Trend in Temperature values for Site below Cannonsville") + 
     #xlab("Date") +
     theme(axis.title.x=element_blank(),
           axis.text.x=element_blank(),
-          axis.ticks.x=element_blank())
+          axis.ticks.x=element_blank()) +
     ylab("Mean Monthly temperature in Degrees Celsius") 
     
-    #geom_abline()
+    
   
   this_filename <-  file.path('3_summarize/', 'out/', 'line_plot', '.png', fsep = "")
-  ggsave(filename = this_filename, p, height = 7, width = 12)
+  ggsave(filename = this_filename, p, height = 7, width = 12, scale = 0.8)
   return(this_filename)
 }
 
