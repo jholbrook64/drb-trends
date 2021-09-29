@@ -13,8 +13,17 @@
 
 overlap_density <-  function(regression_data_all)
 { 
+  browser()
+  regression_data_all <- regression_data_all %>% 
+    group_by(regression_type) %>% 
+    mutate(group_mean = mean(Slope, na.rm = TRUE)) %>% 
+    ungroup()
+                        
   p <- ggplot(aes(x=Slope, fill = regression_type), data = regression_data_all) +
+    geom_vline(data = regression_data_all, aes(xintercept = group_mean, size = 1,
+                                               color = regression_type, group = regression_type, na.rm = FALSE, show.legend = FALSE)) +
     geom_density(alpha = 0.6)+
+    scale_color_identity() +
     theme_bw() +
     scale_color_brewer() +
     ggtitle("Distribution of Warming Trends Across Selected Sites") + 

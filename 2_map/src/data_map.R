@@ -61,7 +61,6 @@ boxplot_func <- function(regression_data, type, site_info)
   }
   if (type == 2) 
   {
-    browser()
     regression_data$Month <- as.factor(regression_data$Month)
     regression_data$Slope <- as.numeric(regression_data$Slope)
     regression_data$reservoir_code <- as.factor(regression_data$reservoir_code)
@@ -83,8 +82,8 @@ boxplot_func <- function(regression_data, type, site_info)
       stat_summary(fun = median, fun.min = median, fun.max = median,
                    geom = "crossbar",
                    width = 0.25, color = 'black') +
-      geom_jitter(aes(shape=`Significant above a P of 0.05`, fill = ifelse(change_category == 'no change', "white", "grey") ,
-                      size = 4, color = ifelse(Slope < 0, "red", "blue")), position=position_jitter(0.2), alpha = 0.4) +
+      geom_jitter(fill = ifelse(regression_data$change_category == 'no change', "white", "grey"), aes(shape=`Significant above a P of 0.05`,
+                        size = 4, color = ifelse(Slope < 0, "red", "blue")), position=position_jitter(0.2), alpha = 0.4) +
       scale_color_identity() +
       scale_shape_manual(values = c(21,16)) +
       theme_bw() +
@@ -98,7 +97,6 @@ boxplot_func <- function(regression_data, type, site_info)
   }
   else if (type == 1)
   {
-    browser()
     regression_data$Month <- as.factor(regression_data$Month)
     regression_data$Slope <- as.numeric(regression_data$Slope)
     regression_data$reservoir_code <- as.factor(regression_data$reservoir_code)
@@ -120,8 +118,8 @@ boxplot_func <- function(regression_data, type, site_info)
       stat_summary(fun = median, fun.min = median, fun.max = median,
                    geom = "crossbar",
                    width = 0.25, color = 'black') +
-      geom_jitter(aes(shape=`Significant above a P of 0.05`, fill = ifelse(change_category == 'no change', "white", "grey") ,
-                      size = 4, color = ifelse(Slope < 0, "red", "blue")), position=position_jitter(0.2), alpha = 0.4) +
+      geom_jitter(fill = ifelse(regression_data$change_category == 'no change', "white", "grey"), aes(shape=`Significant above a P of 0.05`,
+                        size = 4, color = ifelse(Slope < 0, "red", "blue")), position=position_jitter(0.2), alpha = 0.4) +
       scale_color_identity() +
       scale_shape_manual(values = c(21,16)) +
       theme_bw() +
@@ -138,7 +136,6 @@ boxplot_func <- function(regression_data, type, site_info)
 map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk) 
 {
   #browser()
-
   points <- as.data.frame(readRDS(in_crosswalk))
   site_v <- data_for_trend_analysis_month$site.id
   names(points)[names(points) == 'site_id'] <- 'site.id'

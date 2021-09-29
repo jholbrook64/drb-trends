@@ -17,6 +17,7 @@ source("1_fetch/src/data_summary.R")
 tar_option_set(packages = c('tidyverse'))
 
 meta_summaries <- list(
+  
   tar_target(density_plots,
              overlap_density(bind_regressions), format = 'file'),
   
