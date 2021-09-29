@@ -70,8 +70,6 @@ browser()
     mean_temp <- mean(sites$month_meanOfMin, na.rm = TRUE)
     min_temp <-  min(sites$month_meanOfMin, na.rm = TRUE)
   } else if (type == 4) {
-    # kept as of 12:34 pm on monday 8-2
-    # here there is a problem of one of the targets having all NA values
     if(all(is.nan(sites$annual_mean)))
     {
       return(
@@ -112,7 +110,7 @@ browser()
                         "Slope" = stats[2],
                         #"r" = rs^(1/2),
                         "p_value" = p_vlaue,
-                        "is_significant" = p_vlaue < 0.01,
+                        "is_significant" = p_vlaue < 0.05,
                         "r2" = rs)
   return(dfstats)
 }

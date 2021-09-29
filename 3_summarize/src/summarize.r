@@ -13,7 +13,7 @@
 
 overlap_density <-  function(regression_data_all)
 { 
-  p <- ggplot(aes(x=Slope, fill = regression_type, group = regression_type), data = regression_data_all) +
+  p <- ggplot(aes(x=Slope, fill = regression_type), data = regression_data_all) +
     geom_density(alpha = 0.6)+
     theme_bw() +
     scale_color_brewer() +
@@ -29,19 +29,12 @@ overlap_density <-  function(regression_data_all)
 
 line_plot_function <- function(temp_data)
 {
-  browser()
-  #making a date vector
-  temp_data <- temp_data %>% filter(month ==7)
-  temp_data$Date <- paste(temp_data$year, temp_data$month)
-
-  p <- ggplot(data = subset(temp_data, !is.na(month_mean)), aes(x=Date, y= month_mean), group =1) +
+  #browser()
+  p <- ggplot(data = subset(temp_data, !is.na(month_mean)), aes(x=year, y= month_mean), group =1) +
     geom_point()+
-    geom_abline() +
-    #geom_smooth(method = "lm")+
+    geom_smooth(formula = y ~ x, method = "lm")+
     theme_bw() +
-    
     ggtitle("Trend in Temperature values for Site below Cannonsville") + 
-    #xlab("Date") +
     theme(axis.title.x=element_blank(),
           axis.text.x=element_blank(),
           axis.ticks.x=element_blank()) +
@@ -50,7 +43,7 @@ line_plot_function <- function(temp_data)
     
   
   this_filename <-  file.path('3_summarize/', 'out/', 'line_plot', '.png', fsep = "")
-  ggsave(filename = this_filename, p, height = 7, width = 12, scale = 0.8)
+  ggsave(filename = this_filename, p, height = 7, width = 12, scale = 0.6)
   return(this_filename)
 }
 

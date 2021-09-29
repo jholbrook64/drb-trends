@@ -41,16 +41,12 @@ boxplot_func <- function(regression_data, type, site_info)
       geom_violin() +
       stat_summary(fun = median, fun.min = median, fun.max = median,
                    geom = "crossbar",
-                   width = 0.25, color = 'red') +
-      #geom_jitter(shape=16, position=position_jitter(0.2), alpha = 0.4) +
-      geom_jitter(aes(shape=`Significant above a P of 0.01`), position=position_jitter(0.2), alpha = 0.4) +
+                   width = 0.25, color = 'black') +
+      geom_jitter(aes(shape=`Significant above a P of 0.05`, size = 4), position=position_jitter(0.2), alpha = 0.4) +
       scale_shape_manual(values = c(1,16)) +
-      # theme_bw(axis.text.x = element_text(angle = 90)) +
       theme_bw() +
-      #theme() +
       scale_color_brewer(palette="Dark2") +
       ggtitle("Distribution of Stream Segment Trends for Each Month from Daily Temperature Minimums") + 
-      xlab("Months") +
       ylab("site Trends") 
     
     this_filename <- file.path('2_map', 'out', 'boxplots_monthly_min.png')
@@ -80,16 +76,12 @@ boxplot_func <- function(regression_data, type, site_info)
       geom_violin() +
       stat_summary(fun = median, fun.min = median, fun.max = median,
                    geom = "crossbar",
-                   width = 0.25, color = 'red') +
-      #geom_jitter(shape=16, position=position_jitter(0.2), alpha = 0.4) +
-      geom_jitter(aes(shape=`Significant above a P of 0.01`), position=position_jitter(0.2), alpha = 0.4) +
+                   width = 0.25, color = 'black') +
+      geom_jitter(aes(shape=`Significant above a P of 0.05`, size = 4), position=position_jitter(0.2), alpha = 0.4) +
       scale_shape_manual(values = c(1,16)) +
-     # theme_bw(axis.text.x = element_text(angle = 90)) +
       theme_bw() +
-      #theme() +
       scale_color_brewer(palette="Dark2") +
       ggtitle("Distribution of Stream Segment Trends for Each Month from Daily Temperature Means") + 
-      xlab("Months") +
       ylab("site Trends") 
     
     this_filename <- file.path('2_map', 'out', 'boxplots_monthly_mean.png')
@@ -119,13 +111,12 @@ boxplot_func <- function(regression_data, type, site_info)
       geom_violin() +
       stat_summary(fun = median, fun.min = median, fun.max = median,
                    geom = "crossbar",
-                   width = 0.25, color = 'red') +
-      geom_jitter(aes(shape=`Significant above a P of 0.01`), position=position_jitter(0.2), alpha = 0.4) +
+                   width = 0.25, color = 'black') +
+      geom_jitter(aes(shape=`Significant above a P of 0.05`, size = 4), position=position_jitter(0.2), alpha = 0.4) +
       scale_shape_manual(values = c(1,16)) +
       theme_bw() +
       scale_color_brewer(palette="Dark2") +
       ggtitle("Distribution of Stream Segment Trends for Each Month from Daily Temperature Maximums") + 
-      xlab("Months") +
       ylab("site Trends") 
     
     this_filename <- file.path('2_map', 'out', 'boxplots_monthly_max.png')
@@ -146,22 +137,19 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
   
   # joins attribute w/ spatial data from attribute to points
   net_d <- net %>% left_join(points, by = 'seg_id_nat')  # this works!
-  # example is below:
-  #regression_data <- regression_data %>% left_join(site_info, by = 'site.id')
   
   # joins attribute w/ spatial data from attribute & points to network lines
   names(net_d)[names(net_d) == 'site_id'] <- 'site.id'
   net_d <- net_d %>% left_join(data_for_trend_analysis_month, by = 'site.id') 
-  # net_p <- left_join(points, select(data_for_trend_analysis_month, site_id = site_id, Slope))
-  # net_p <- st_as_sf(net_p)
   
   points_p <- st_as_sf(select_points, coords = c("longitude", "latitude"), 
                        crs = 4326)
   points_data <- points_p %>% left_join(data_for_trend_analysis_month, by = 'site.id')
   names(points_data)[names(points_data) == 'Slope'] <- 'Warming Trend degC Year'
-  #net_p <- left_join(points, select(points, seg_id_nat = seg_id_nat, geometry, ID, longitude, latitude))
+  
   # reassign variable name for a better legend
   names(net_d)[names(net_d) == 'Slope'] <- 'Warming Trend degC Year'
+  
   #  assigns file name based off date month, is same value for each branch
   month <- unique((data_for_trend_analysis_month$Month))
   month_list <- c("January", "February", "March", "April", "May", "June", "July", "August",
@@ -179,10 +167,8 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
     geom_sf(data = background, fill="white") +
     geom_sf(color = 'grey') +
     geom_sf(data = filter(net_d, !is.na(`Warming Trend degC Year`))) +
-    geom_sf(data = points_data, aes(color =`Warming Trend degC Year`)) +   #$seg_id_nat == data_for_trend_analysis_month$seg_id_nat), aes(color = fish_dist_to_outlet_m)) +
-    #geom_point(data = net_d, aes(x = longitude, y = latitude, size = years))
+    geom_sf(data = points_data, aes(color =`Warming Trend degC Year`)) +   
     theme_bw() +
-    #geom_sf(data = points_p) +
     coord_sf(xlim = c(min(points$longitude), xmax = max(points$longitude)),
              ylim = c(ymin = min(points$latitude), ymax = max(points$latitude)),
              crs = 4326) +
@@ -198,7 +184,7 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
 }
 
 
-map_tiles <-function(data_for_trend_analysis_month, in_network, in_crosswalk)   # takes in the sample spatial data as other function
+map_tiles <-function(data_for_trend_analysis_month, in_network, in_crosswalk)   
 {
   browser()
   # simply trying to get an interactive tile map of the same static map
@@ -263,9 +249,4 @@ hist_func <- function(regression_data)
   this_filename <-  file.path('2_map', 'out', 'trends_hist.png')
   ggsave(filename = this_filename, boxp, height = 7, width = 12)
   return(this_filename)
-}
-
-overlap_density <-  function(regression_data1, regression_data2, regression_data3)
-{
-  
 }
