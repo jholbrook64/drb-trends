@@ -17,10 +17,11 @@ boxplot_func <- function(regression_data, type, site_info)
   # this is new, used to join data
   site_info <- read_csv(site_info)
   regression_data <- regression_data %>% left_join(site_info, by = 'site.id')
+  regression_data <- regression_data %>% mutate(change_category = case_when(is_significant < 0.05 & Slope > 0 ~ 'increasing',
+                                                                            is_significant < 0.05 & Slope < 0 ~ 'decreasing', TRUE ~ 'no change'))
 
   if (type == 3) 
   {
-    browser()
     regression_data$Month <- as.factor(regression_data$Month)
     regression_data$Slope <- as.numeric(regression_data$Slope)
     regression_data$reservoir_code <- as.factor(regression_data$reservoir_code)
@@ -32,7 +33,7 @@ boxplot_func <- function(regression_data, type, site_info)
     binned_slope <- cut(regression_data$Slope, 12, inlcude.lowest = TRUE, labels = labs)
     
     names(regression_data)[names(regression_data) == 'reservoir_code'] <- 'Reservoir Code'
-    names(regression_data)[names(regression_data) == 'is_significant'] <- 'Significant above a P of 0.01'
+    names(regression_data)[names(regression_data) == 'is_significant'] <- 'Significant above a P of 0.05'
     
     regression_data$Month <- factor(regression_data$Month, levels = month.name)
     regression_data <- filter(regression_data, !is.na(`Reservoir Code`))
@@ -42,15 +43,20 @@ boxplot_func <- function(regression_data, type, site_info)
       stat_summary(fun = median, fun.min = median, fun.max = median,
                    geom = "crossbar",
                    width = 0.25, color = 'black') +
-      geom_jitter(aes(shape=`Significant above a P of 0.05`, size = 4), position=position_jitter(0.2), alpha = 0.4) +
-      scale_shape_manual(values = c(1,16)) +
+      geom_jitter(fill = ifelse(regression_data$change_category == 'no change', "white", "grey"), aes(shape=`Significant above a P of 0.05`,
+                      size = 4, color = ifelse(Slope < 0, "red", "blue")), position=position_jitter(0.2), alpha = 0.4) +
+      scale_color_identity() +
+      scale_shape_manual(values = c(21,16)) +
       theme_bw() +
       scale_color_brewer(palette="Dark2") +
-      ggtitle("Distribution of Stream Segment Trends for Each Month from Daily Temperature Minimums") + 
-      ylab("site Trends") 
+      ggtitle("Distribution of Stream Segment Trends for Each Month from Daily Temperature Means") + 
+      ylab("Site Specific Temperature Trends in Degrees Celsius per Year") +
+      xlab("")+
+      guides(size = FALSE)+
+      guides(color = FALSE)
     
     this_filename <- file.path('2_map', 'out', 'boxplots_monthly_min.png')
-    ggsave(filename = this_filename, boxp, height = 7, width = 12)
+    ggsave(filename = this_filename, boxp, height = 7, width = 12, scale = 1)
     return(this_filename)
   }
   if (type == 2) 
@@ -67,7 +73,7 @@ boxplot_func <- function(regression_data, type, site_info)
     binned_slope <- cut(regression_data$Slope, 12, inlcude.lowest = TRUE, labels = labs)
   
     names(regression_data)[names(regression_data) == 'reservoir_code'] <- 'Reservoir Code'
-    names(regression_data)[names(regression_data) == 'is_significant'] <- 'Significant above a P of 0.01'
+    names(regression_data)[names(regression_data) == 'is_significant'] <- 'Significant above a P of 0.05'
     
     regression_data$Month <- factor(regression_data$Month, levels = month.name)
     regression_data <- filter(regression_data, !is.na(`Reservoir Code`))
@@ -77,8 +83,10 @@ boxplot_func <- function(regression_data, type, site_info)
       stat_summary(fun = median, fun.min = median, fun.max = median,
                    geom = "crossbar",
                    width = 0.25, color = 'black') +
-      geom_jitter(aes(shape=`Significant above a P of 0.05`, size = 4), position=position_jitter(0.2), alpha = 0.4) +
-      scale_shape_manual(values = c(1,16)) +
+      geom_jitter(aes(shape=`Significant above a P of 0.05`, fill = ifelse(change_category == 'no change', "white", "grey") ,
+                      size = 4, color = ifelse(Slope < 0, "red", "blue")), position=position_jitter(0.2), alpha = 0.4) +
+      scale_color_identity() +
+      scale_shape_manual(values = c(21,16)) +
       theme_bw() +
       scale_color_brewer(palette="Dark2") +
       ggtitle("Distribution of Stream Segment Trends for Each Month from Daily Temperature Means") + 
@@ -102,7 +110,7 @@ boxplot_func <- function(regression_data, type, site_info)
     binned_slope <- cut(regression_data$Slope, 12, inlcude.lowest = TRUE, labels = labs)
     
     names(regression_data)[names(regression_data) == 'reservoir_code'] <- 'Reservoir Code'
-    names(regression_data)[names(regression_data) == 'is_significant'] <- 'Significant above a P of 0.01'
+    names(regression_data)[names(regression_data) == 'is_significant'] <- 'Significant above a P of 0.05'
     
     regression_data$Month <- factor(regression_data$Month, levels = month.name)
     regression_data <- filter(regression_data, !is.na(`Reservoir Code`))
@@ -112,8 +120,10 @@ boxplot_func <- function(regression_data, type, site_info)
       stat_summary(fun = median, fun.min = median, fun.max = median,
                    geom = "crossbar",
                    width = 0.25, color = 'black') +
-      geom_jitter(aes(shape=`Significant above a P of 0.05`, size = 4), position=position_jitter(0.2), alpha = 0.4) +
-      scale_shape_manual(values = c(1,16)) +
+      geom_jitter(aes(shape=`Significant above a P of 0.05`, fill = ifelse(change_category == 'no change', "white", "grey") ,
+                      size = 4, color = ifelse(Slope < 0, "red", "blue")), position=position_jitter(0.2), alpha = 0.4) +
+      scale_color_identity() +
+      scale_shape_manual(values = c(21,16)) +
       theme_bw() +
       scale_color_brewer(palette="Dark2") +
       ggtitle("Distribution of Stream Segment Trends for Each Month from Daily Temperature Maximums") + 
