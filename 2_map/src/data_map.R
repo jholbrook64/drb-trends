@@ -164,10 +164,10 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
   points_p <- st_as_sf(select_points, coords = c("longitude", "latitude"), 
                        crs = 4326)
   points_data <- points_p %>% left_join(data_for_trend_analysis_month, by = 'site.id')
-  names(points_data)[names(points_data) == 'Slope'] <- 'Warming Trend degC Year'
+  names(points_data)[names(points_data) == 'Slope'] <- 'Temperature trend (degC/year)'
   
   # reassign variable name for a better legend
-  names(net_d)[names(net_d) == 'Slope'] <- 'Warming Trend degC Year'
+  names(net_d)[names(net_d) == 'Slope'] <- 'Temperature trend (degC/year)'
   
   #  assigns file name based off date month, is same value for each branch
   month <- unique((data_for_trend_analysis_month$Month))
@@ -185,8 +185,8 @@ map_sites <- function(data_for_trend_analysis_month, in_network, in_crosswalk)
   p <- ggplot(net_d) +
     geom_sf(data = background, fill="white") +
     geom_sf(color = 'grey') +
-    geom_sf(data = filter(net_d, !is.na(`Warming Trend degC Year`))) +
-    geom_sf(data = points_data, aes(color =`Warming Trend degC Year`)) +   
+    geom_sf(data = filter(net_d, !is.na(`Temperature trend (degC/year)`))) +
+    geom_sf(data = points_data, aes(color =`Temperature trend (degC/year)`)) +   
     theme_bw() +
     coord_sf(xlim = c(min(points$longitude), xmax = max(points$longitude)),
              ylim = c(ymin = min(points$latitude), ymax = max(points$latitude)),
