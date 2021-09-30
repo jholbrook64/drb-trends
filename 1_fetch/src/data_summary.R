@@ -11,6 +11,14 @@
 ##     ~ this is the file that runs linear regressions
 ## ---------------------------
 
+
+#' Creates linear regressions per each branch fed into the function
+#'
+#' @param sites A data frame of daily water temperature observation values
+#' @param type A categorical value for the type of regression ran, type can be either 1, 2, 3, or 4
+#' @return data frame of trend values from each regression of the branch
+#' @examples
+#' line_plot_function(data, 3)
 flexible_linear_regression <- function(sites, type)
 {
 #browser()
@@ -131,50 +139,13 @@ summarize_table <- function(regression_table)
   return(summaryT)
 }
 
-write_summary_positive <- function(dfstats)
-{
-  #These will only include metrics from the month of July since that is the hottest month on record
-  month_table <- dfstats %>%
-    filter(Month == 7) %>%
-    filter(Slope > 0.0)
-
-  df_positive <-  data.frame(
-    # "Positive values" = NULL,
-    "median_temp" = median(month_table$mean_monthly_temp),
-    "greatest_change" = max(month_table$Slope),
-    "median_change" = median(month_table$Slope),
-    "least_change" = min(month_table$Slope)
-  )
-  df_positive_transpose <- as.data.frame(t(as.matrix(df_positive)))
-  # seg_id_vect <- c(which(median(month_table$mean_monthly_temp)), which(max(month_table$Slope)),
-  #                  which(median(month_table$Slope)), which(min(month_table$Slope)))
-  seg_id_vect <- c(match(median(month_table$mean_monthly_temp),month_table), match(max(month_table$Slope),month_table),
-                   match(median(month_table$Slope),month_table), match(min(month_table$Slope),month_table))
-  df_positive_transpose <- cbind(df_positive_transpose, seg_id_vect)
-  return(df_positive_transpose)
-}
-
-write_summary_negative <- function(dfstats)
-{
-  month_table <- dfstats %>%
-    filter(Month == 7) %>%
-    filter(Slope < 0.0)
-
-  df_negative <-  data.frame(
-    #"Negative values" = NULL,
-    "median_temp" = median(month_table$mean_monthly_temp),
-    "greatest_change" = max(month_table$Slope),
-    "median_change" = median(month_table$Slope),
-    "least_change" = min(month_table$Slope)
-  )
-
-  df_negative_transpose <- as.data.frame(t(as.matrix(df_negative)))
-  seg_id_vect <- c(match(median(month_table$mean_monthly_temp),month_table), match(max(month_table$Slope),month_table),
-                   match(median(month_table$Slope),month_table), match(min(month_table$Slope),month_table))
-  df_negative_transpose <- cbind(df_negative_transpose, seg_id_vect)
-  return(df_negative_transpose)
-}
-
+#' Creates a single density plot that shows the distribution of trends of the annual data regressions
+#'
+#' @param sites A data frame of daily water temperature observation values
+#' @param type A categorical value for the type of regression ran, type can be either 1, 2, 3, or 4
+#' @return data frame of trend values from each regression of the branch
+#' @examples
+#' line_plot_function(data, 3)
 density_plot <- function(annual_data)
 {
   p <- ggplot(data = annual_data, aes(x=Slope)) +

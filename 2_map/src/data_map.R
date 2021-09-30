@@ -11,6 +11,15 @@
 ##     ~  
 ## ---------------------------
 
+
+#' Creates box plots showing distribution of each mean, min nad max monthly regression
+#'
+#' @param regression_data A data frame of daily water temperature observation values
+#' @param type A categorical value for the type of regression ran, type can be either 1, 2, 3, or 4
+#' @param site_info A data frame of ordinal reservoir codes
+#' @return data frame of trend values from each regression of the branch
+#' @examples
+#' boxplot_func(data, 3, "2_map/in/reservoir_coding.csv")
 boxplot_func <- function(regression_data, type, site_info)
 {
   #browser()
@@ -43,8 +52,9 @@ boxplot_func <- function(regression_data, type, site_info)
       stat_summary(fun = median, fun.min = median, fun.max = median,
                    geom = "crossbar",
                    width = 0.25, color = 'black') +
-      geom_jitter(fill = ifelse(regression_data$change_category == 'no change', "white", "grey"), aes(shape=`Significant above a P of 0.05`,
+      geom_jitter(aes(fill = change_category, shape=`Significant above a P of 0.05`,
                       size = 4, color = ifelse(Slope < 0, "red", "blue")), position=position_jitter(0.2), alpha = 0.4) +
+      scale_fill_manual(values = c("white","grey0",  "grey"))+ 
       scale_color_identity() +
       scale_shape_manual(values = c(21,16)) +
       theme_bw() +
@@ -82,8 +92,9 @@ boxplot_func <- function(regression_data, type, site_info)
       stat_summary(fun = median, fun.min = median, fun.max = median,
                    geom = "crossbar",
                    width = 0.25, color = 'black') +
-      geom_jitter(fill = ifelse(regression_data$change_category == 'no change', "white", "grey"), aes(shape=`Significant above a P of 0.05`,
-                        size = 4, color = ifelse(Slope < 0, "red", "blue")), position=position_jitter(0.2), alpha = 0.4) +
+      geom_jitter(aes(fill = change_category, shape=`Significant above a P of 0.05`,
+                      size = 4, color = ifelse(Slope < 0, "red", "blue")), position=position_jitter(0.2), alpha = 0.4) +
+      scale_fill_manual(values = c("white","grey0",  "grey"))+ 
       scale_color_identity() +
       scale_shape_manual(values = c(21,16)) +
       theme_bw() +
@@ -118,8 +129,9 @@ boxplot_func <- function(regression_data, type, site_info)
       stat_summary(fun = median, fun.min = median, fun.max = median,
                    geom = "crossbar",
                    width = 0.25, color = 'black') +
-      geom_jitter(fill = ifelse(regression_data$change_category == 'no change', "white", "grey"), aes(shape=`Significant above a P of 0.05`,
-                        size = 4, color = ifelse(Slope < 0, "red", "blue")), position=position_jitter(0.2), alpha = 0.4) +
+      geom_jitter(aes(fill = change_category, shape=`Significant above a P of 0.05`,
+                      size = 4, color = ifelse(Slope < 0, "red", "blue")), position=position_jitter(0.2), alpha = 0.4) +
+      scale_fill_manual(values = c("white","grey0",  "grey"))+ 
       scale_color_identity() +
       scale_shape_manual(values = c(21,16)) +
       theme_bw() +

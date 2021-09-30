@@ -11,7 +11,13 @@
 ##     ~
 ## ---------------------------
 
-overlap_density <-  function(regression_data_all)
+#' Create overlapping density distribution plots of mean, min and max temperature trends
+#'
+#' @param regression_data_all A long dataframe with record-based groups of 
+#' @return file path to saved figure from \code{regression_data_all}
+#' @examples
+#' overlap_density(df)
+overlap_density <- function(regression_data_all)
 { 
   browser()
   regression_data_all <- regression_data_all %>% 
@@ -36,6 +42,12 @@ overlap_density <-  function(regression_data_all)
   
 }
 
+#' create a line plot of monthly temperature data
+#'
+#' @param temp_data A data frame with aggregated monthly temperature values
+#' @return file path to saved figure from \code{temp_data}
+#' @examples
+#' line_plot_function(df)
 line_plot_function <- function(temp_data)
 {
   #browser()
@@ -56,8 +68,18 @@ line_plot_function <- function(temp_data)
   return(this_filename)
 }
 
-ANOVA <- function(regression_data, crosswalk)
+#' create a line plot of monthly temperature data
+#'
+#' @param regression_data A data frame with aggregated monthly temperature values
+#' @param reservoir_coding A data independent and cetgorical reservoir codes
+#' @return file path to saved .txt summary from of the aov funciton in r
+#' @examples
+#' line_plot_function(df_temp, reservoir)
+ANOVA <- function(regression_data, reservoir_coding)
 {
   # join the regression data to the crosswalk data
   
+  
+  capture <- summary.aov()
+  capture.output()
 }

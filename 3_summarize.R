@@ -33,6 +33,9 @@ meta_summaries <- list(
   
   tar_target(MonthMin_summary, summarize_table(regress_data_monthMins_clean)),
 
+  #ANOVA analysis among site codes
+  # tar_target(reservoirANOVA,
+  #            ANOVA(), format = 'file')
   
   # descriptive stats - create a summary of means across annual branches:
   tar_target(descrip_annual, 
