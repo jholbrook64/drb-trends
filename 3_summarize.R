@@ -17,6 +17,7 @@ source("1_fetch/src/data_summary.R")
 tar_option_set(packages = c('tidyverse'))
 
 meta_summaries <- list(
+  
   tar_target(density_plots,
              overlap_density(bind_regressions), format = 'file'),
   
@@ -32,6 +33,9 @@ meta_summaries <- list(
   
   tar_target(MonthMin_summary, summarize_table(regress_data_monthMins_clean)),
 
+  #ANOVA analysis among site codes
+  # tar_target(reservoirANOVA,
+  #            ANOVA(), format = 'file')
   
   # descriptive stats - create a summary of means across annual branches:
   tar_target(descrip_annual, 
